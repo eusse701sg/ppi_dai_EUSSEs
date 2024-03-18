@@ -22,7 +22,7 @@ Mis responsabilidades incluyen realizar pruebas de automatización, pruebas no f
 - Office.
 
 ## Sportex-App
-Voy a desarrollar una aplicación que conecta a los aficionados al deporte a nivel local, proporcionando información sobre eventos, torneos, clubes y facilidades deportivas en su área. Además de la posibilidad
+Voy a desarrollar una aplicación que conecta a los aficionados al deporte a nivel local, proporcionando información sobre eventos, torneos, clubes y facilidades deportivas en su área.
 
 ### Justificación
 Actualmente existe una demanda continua de plataformas que faciliten la participación en actividades deportivas locales y fomenten un sentido de comunidad entre los aficionados al deporte.

@@ -1,0 +1,17 @@
+Mi nombre es Santiago Eusse Gil, tengo 21 años y soy de Medellín, Colombia.
+Me encuentro en noveno semestre de Ingeniería de Sistemas.
+Actualmente, trabajo como Analista I-Ingeniero de Desarrollo.
+Pertenezco al team DevSecOps allí aplicamos la metodología Scrum y utilizamos Azure DevOps para organizar nuestro trabajo.
+Mis responsabilidades incluyen realizar pruebas de automatización, pruebas no funcionales de carga y estrés, escaneo de
+vulnerabilidades mediante análisis estático del código, CI/CD, etc.
+
+Mis conocimientos y habilidades:
+-Nivel B2 (Upper Intermediate) de inglés.
+-Jmeter.
+-Postman.
+-Python.
+-Java.
+-Azure Devops.
+-Visual Studio Code.
+-Programación Orientada a Objetos.
+-Office.

@@ -1,6 +1,5 @@
 # 🏅 Sportex: Conectando Comunidades a Través del Deporte
 
-![SportexLogo](https://github.com/eusse701sg/ppi_dai_EUSSEs/blob/main/assets/LogoSportex.PNG)
 ![SportexLogoCompleto](https://github.com/eusse701sg/ppi_dai_EUSSEs/blob/main/assets/LogoSportexCompleto.PNG)
 
 ## 📑 Contenido

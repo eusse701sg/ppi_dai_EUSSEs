@@ -1,7 +1,10 @@
 # 🏅 Sportex: Conectando Comunidades a Través del Deporte
 
-<img src="![LogoSportex]([https://github.com/user-attachments/assets/6dea4104-ded5-4317-88ec-75228f0c7019](https://github.com/eusse701sg/ppi_dai_EUSSEs/blob/main/assets/LogoSportex.PNG))
-" alt="Sportex Banner" width="600" height="300">
+<img src="[https://agilidadydevops.net/wp-content/uploads/2022/12/devops_by_dynatrace.png](https://github.com/eusse701sg/ppi_dai_EUSSEs/blob/main/assets/LogoSportex.PNG)" alt="DevOps Banner" width="600"
+height= "300">
+<img src="[https://agilidadydevops.net/wp-content/uploads/2022/12/devops_by_dynatrace.png](https://github.com/eusse701sg/ppi_dai_EUSSEs/blob/main/assets/LogoSportexCompleto.PNG)" alt="DevOps Banner" width="600"
+height= "300">
+
 
 ## 📑 Contenido
 - [Sobre Mí](#sobre-mí)

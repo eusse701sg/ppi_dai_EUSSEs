@@ -1,0 +1,9 @@
+# Excluir el entorno virtual
+EntornoVirtual/
+
+# Excluir archivos compilados de Python
+src/__pycache__/
+*.pyc
+
+# Excluir configuraciones del editor
+.vscode/

@@ -1,0 +1,6 @@
+santiagoegla@gmail.com,1234,seusse,Santiago,Eusse Gil
+sportex@gmail.com,1234,sportex,Sportex,Oficial
+prueba@gmail.com,1234,prueba,prueba,prueba
+mai@gmail.com,1234,mai,Maria Fernanda,Herrera
+juan@gmail.com,1234,juan,juan,rodriguez
+adriana@gmail.com,1234,adriana,adriana,gil

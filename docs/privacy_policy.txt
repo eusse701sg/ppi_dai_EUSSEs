@@ -1,0 +1,373 @@
+Política de Privacidad
+==============
+
+Última actualización: 03 de agosto de 2024
+
+Esta Política de Privacidad describe nuestras políticas y procedimientos sobre la recopilación, uso
+y divulgación de su información cuando utiliza el Servicio y le informa sobre sus derechos de
+privacidad y cómo la ley lo protege.
+
+Usamos sus Datos Personales para proporcionar y mejorar el Servicio. Al utilizar el Servicio, 
+usted acepta la recopilación y el uso de información de acuerdo con esta Política de Privacidad. Esta
+ Política de Privacidad ha sido creada con la ayuda del "Free Privacy Policy Generator"
+ https://www.freeprivacypolicy.com/free-privacy-policy-generator/
+
+Interpretación y Definiciones 
+------------------------------
+
+Interpretación 
+~~~~~~~~~~~~~~
+
+Las palabras con la primera letra en mayúscula tienen significados definidos bajo las siguientes 
+condiciones. Las siguientes definiciones tendrán el mismo significado independientemente de 
+si aparecen en singular o en plural.
+
+Definiciones  
+~~~~~~~~~~~~
+
+Para los propósitos de esta Política de Privacidad:
+
+  * Cuenta significa una cuenta única creada para usted para acceder a 
+  nuestro Servicio o partes de nuestro Servicio.
+
+  * Afiliado significa una entidad que controla, es controlada 
+  por o está bajo control común con una parte, donde "control" significa 
+  la propiedad del 50% o más de las acciones, intereses de capital u otros valores 
+  con derecho a voto para la elección de directores u otra autoridad de gestión.
+
+  * Aplicación se refiere a Sportex, el programa de software 
+  proporcionado por la Compañía.
+
+  * Compañía (referida como "la Compañía", "Nosotros" o "Nuestro" en este Acuerdo) 
+  se refiere a Sportex.
+
+  * País se refiere a: Colombia
+
+  * Dispositivo significa cualquier dispositivo que pueda acceder al Servicio, 
+  como una computadora, un teléfono celular o una tableta digital.
+
+  * Datos Personales son cualquier información que se relacione con una 
+  persona identificada o identificable.
+
+  * Servicio se refiere a la Aplicación.
+
+  * Proveedor de Servicios significa cualquier persona natural o 
+  jurídica que procesa los datos en nombre de la Compañía. Se refiere a empresas o individuos externos contratados por la Compañía para facilitar el Servicio, proporcionar el Servicio en nombre de la Compañía, realizar servicios relacionados con el Servicio o ayudar a la Compañía a analizar cómo se utiliza el Servicio.
+
+  * Servicio de Redes Sociales de Terceros se refiere a cualquier 
+  sitio web o red social a través del cual un Usuario puede iniciar sesión o crear una cuenta para usar el Servicio.
+
+  * Datos de Uso se refiere a datos recopilados automáticamente, 
+  ya sea generados por el uso del Servicio o de la infraestructura del Servicio en 
+  sí (por ejemplo, la duración de una visita a una página).
+
+  * Usted significa el individuo que accede o utiliza el Servicio, o la empresa, 
+  o cualquier otra entidad legal en nombre de la cual dicho individuo está accediendo 
+  o utilizando el Servicio, según corresponda.
+
+Recopilación y Uso de sus Datos Personales  
+-----------------------------------------
+
+Tipos de Datos Recopilados 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Datos  
+*************
+
+Mientras usa nuestro Servicio, podemos pedirle que nos proporcione cierta información 
+personalmente identificable que puede ser utilizada para contactarlo o identificarlo.
+ La información personalmente identificable puede incluir, pero no se limita a:
+
+ * Dirección de correo electrónico
+
+ * Nombre y apellido
+
+ * Número de teléfono
+
+ * Dirección, Estado, Provincia, Código Postal, Ciudad
+
+ * Datos de Uso
+
+Datos de Uso 
+**********
+
+Los Datos de Uso se recopilan automáticamente cuando se utiliza el Servicio.
+
+Los Datos de Uso pueden incluir información como la dirección de Protocolo de Internet (IP) 
+de su Dispositivo (por ejemplo, IP), tipo de navegador, versión del navegador, 
+las páginas de nuestro Servicio que visita, la hora y la fecha de su visita, 
+el tiempo pasado en esas páginas, identificadores únicos del dispositivo y otros 
+datos de diagnóstico.
+
+Cuando accede al Servicio a través de un dispositivo móvil, podemos 
+recopilar cierta información automáticamente, incluyendo, pero no limitado a, 
+el tipo de dispositivo móvil que usa, el ID único de su dispositivo móvil, 
+la dirección IP de su dispositivo móvil, el sistema operativo de su dispositivo móvil, 
+el tipo de navegador de Internet móvil que utiliza, identificadores únicos del dispositivo 
+y otros datos de diagnóstico.
+
+También podemos recopilar información que su navegador envía cada 
+vez que visita nuestro Servicio o cuando accede al Servicio a 
+través de un dispositivo móvil.
+
+Información de Servicios de Redes Sociales de Terceros  
+**************************************************
+
+La Compañía le permite crear una cuenta e iniciar sesión para 
+usar el Servicio a través de los siguientes Servicios 
+de Redes Sociales de Terceros:
+
+ * Google
+ * Facebook
+ * Instagram
+ * Twitter
+ * LinkedIn
+
+Si decide registrarse a través de o de otro modo concedernos acceso a 
+un Servicio de Redes Sociales de Terceros, podemos recopilar Datos Personales 
+que ya están asociados con su cuenta de Servicio de Redes Sociales de Terceros, 
+como su nombre, su dirección de correo electrónico, sus actividades o su lista de 
+contactos asociada con esa cuenta.
+
+También puede tener la opción de compartir información adicional con la Compañía a 
+través de su cuenta de Servicio de Redes Sociales de Terceros. Si elige proporcionar 
+dicha información y Datos Personales, durante el registro u otro momento, está dando a 
+la Compañía permiso para usar, compartir y almacenar dicha información de manera consistente 
+con esta Política de Privacidad.
+
+Información Recopilada mientras usa la Aplicación 
+*************************************************
+
+Mientras usa nuestra Aplicación, para proporcionar características de 
+nuestra Aplicación, podemos recopilar, con su permiso previo:
+
+ * Información sobre su ubicación
+
+Usamos esta información para proporcionar características de nuestro Servicio, 
+para mejorar y personalizar nuestro Servicio. La información puede ser 
+cargada en los servidores de la Compañía y/o en el servidor de un Proveedor 
+de Servicios o puede ser simplemente almacenada en su dispositivo.
+
+Puede habilitar o deshabilitar el acceso a esta información en cualquier momento, 
+a través de la configuración de su Dispositivo.
+
+Uso de sus Datos Personales 
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+La Compañía puede usar los Datos Personales para los siguientes propósitos:
+
+  * Para proporcionar y mantener nuestro Servicio, incluyendo la 
+  supervisión del uso de nuestro Servicio.
+
+  * Para gestionar su Cuenta: para gestionar su registro como 
+  usuario del Servicio. Los Datos Personales que proporciona 
+  pueden darle acceso a diferentes funcionalidades del Servicio 
+  que están disponibles para usted como usuario registrado.
+
+  * Para la ejecución de un contrato: el desarrollo, cumplimiento 
+  y realización del contrato de compra para los productos, 
+  artículos o servicios que ha comprado o de cualquier otro 
+  contrato con nosotros a través del Servicio.
+
+  * Para contactarlo: Para contactarlo por correo electrónico, 
+  llamadas telefónicas, SMS u otras formas equivalentes de comunicación 
+  electrónica, como notificaciones push de una aplicación móvil relacionadas 
+  con actualizaciones o comunicaciones informativas relacionadas con las 
+  funcionalidades, productos o servicios contratados, incluyendo actualizaciones 
+  de seguridad, cuando sea necesario o razonable para su implementación.
+
+  * Para proporcionarle noticias, ofertas especiales e información general 
+  sobre otros bienes, servicios y eventos que ofrecemos que sean similares a 
+  aquellos que ya ha comprado o consultado, a menos que haya optado por no recibir 
+  dicha información.
+
+  * Para gestionar sus solicitudes: Para atender y gestionar sus solicitudes 
+  hacia nosotros.
+
+  * Para transferencias de negocios: Podemos usar su información para evaluar o 
+  llevar a cabo una fusión, venta, reestructuración, reorganización, disolución 
+  u otra venta o transferencia de algunos o todos nuestros activos, ya sea como 
+  una empresa en funcionamiento o como parte de un procedimiento de quiebra, 
+  liquidación o similar, en el cual los Datos Personales que mantenemos sobre los 
+  usuarios del Servicio están entre los activos transferidos.
+
+  * Para otros propósitos: Podemos usar su información para otros propósitos, como 
+  el análisis de datos, la identificación de tendencias de uso, la determinación de 
+  la efectividad de nuestras campañas promocionales y para evaluar y mejorar nuestro Servicio, 
+  productos, servicios, marketing y su experiencia.
+
+Podemos compartir su información personal en las siguientes situaciones:
+
+  * Con Proveedores de Servicios: Podemos compartir su información personal con 
+  Proveedores de Servicios para supervisar y analizar el uso de nuestro Servicio, 
+  para contactarlo.
+
+  * Para transferencias de negocios: Podemos compartir o transferir su información 
+  personal en conexión con, o durante las negociaciones de, cualquier fusión, venta de 
+  activos de la Compañía, financiamiento o adquisición de todo o parte de nuestro negocio 
+  a otra empresa.
+
+  * Con Afiliados: Podemos compartir su información con nuestros afiliados, en cuyo caso 
+  requeriremos que esos afiliados respeten esta Política de Privacidad. Los afiliados 
+  incluyen nuestra empresa matriz y cualquier otra subsidiaria, socios de empresas 
+  conjuntas u otras empresas que controlamos o que están bajo control común con nosotros.
+
+  * Con socios comerciales: Podemos compartir su información con nuestros socios 
+  comerciales para ofrecerle ciertos productos, servicios o promociones.
+
+  * Con otros usuarios: cuando comparta información personal o interactúe de 
+  otro modo en las áreas públicas con otros usuarios, dicha información
+  puede ser vista por todos los usuarios y puede ser distribuida públicamente. 
+  Si interactúa con otros usuarios o se registra a través de un Servicio de Redes 
+  Sociales de Terceros, sus contactos en el Servicio de Redes Sociales de Terceros pueden 
+  ver su nombre, perfil, fotos y descripción de su actividad. De manera similar, otros 
+  usuarios podrán ver descripciones de su actividad, comunicarse con usted y ver su perfil.
+
+  * Con su consentimiento: Podemos divulgar su información personal para cualquier otro propósito 
+  con su consentimiento.
+
+
+Retención de sus Datos Personales  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+La Compañía retendrá sus Datos Personales solo durante el tiempo que sea necesario 
+para los fines establecidos en esta Política de Privacidad. Retendremos y
+utilizaremos sus Datos Personales en la medida necesaria para cumplir con nuestras 
+obligaciones legales (por ejemplo, si necesitamos conservar sus datos para cumplir 
+con las leyes aplicables), resolver disputas y hacer cumplir nuestros acuerdos y políticas 
+legales.
+
+La Compañía también retendrá los Datos de Uso para fines de análisis interno. Los 
+Datos de Uso generalmente se retienen durante un período más corto, excepto 
+cuando estos datos se usan para mejorar la seguridad o para mejorar la funcionalidad 
+de nuestro Servicio, o cuando estamos legalmente obligados a retener estos datos durante 
+períodos más largos.
+
+Transferencia de sus Datos Personales  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Su información, incluidos los Datos Personales, se procesa en las 
+oficinas operativas de la Compañía y en cualquier otro lugar donde 
+se encuentren las partes involucradas en el procesamiento. Esto significa 
+que esta información puede ser transferida y mantenida en computadoras ubicadas 
+fuera de su estado, provincia, país u otra jurisdicción gubernamental donde las leyes 
+de protección de datos pueden diferir de las de su jurisdicción.
+
+Su consentimiento a esta Política de Privacidad seguido de su envío de dicha 
+información representa su acuerdo con esa transferencia.
+
+La Compañía tomará todas las medidas razonablemente necesarias 
+para garantizar que sus datos se traten de manera segura y de acuerdo 
+con esta Política de Privacidad, y no se realizará ninguna transferencia de 
+sus Datos Personales a una organización o país a menos que existan controles 
+adecuados en su lugar, incluyendo la seguridad de sus datos y otra información personal.
+
+
+Eliminación de sus Datos Personales
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Usted tiene el derecho de eliminar o solicitar que ayudemos 
+a eliminar los Datos Personales que hemos recopilado sobre usted.
+
+Nuestro Servicio puede ofrecerle la capacidad de 
+eliminar cierta información sobre usted desde dentro del Servicio.
+
+Puede actualizar, modificar o eliminar su información 
+en cualquier momento iniciando sesión en su Cuenta, si tiene una, 
+y visitando la sección de configuración de la cuenta que le permite 
+gestionar su información personal. También puede contactarnos para 
+solicitar acceso, corregir o eliminar cualquier información personal 
+que haya proporcionado.
+
+Sin embargo, tenga en cuenta que podemos necesitar retener cierta 
+información cuando tengamos una obligación legal o base legítima para hacerlo.
+
+Divulgación de sus Datos Personales 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Transacciones Comerciales
+*********************
+
+Si la Compañía está involucrada en una fusión, adquisición o venta de activos, 
+sus Datos Personales pueden ser transferidos. 
+Le informaremos antes de que sus Datos Personales 
+sean transferidos y se sometan a una Política de Privacidad diferente.
+
+Law enforcement  
+***************
+
+Bajo ciertas circunstancias, la Compañía puede verse obligada a divulgar sus 
+Datos Personales si así lo requiere la ley o en respuesta a solicitudes 
+válidas de autoridades públicas (por ejemplo, un tribunal o una agencia gubernamental).
+
+
+Otros requisitos legales  
+************************
+
+La Compañía puede divulgar sus Datos Personales con la creencia de buena fe de que tal 
+acción es necesaria para:
+
+
+  * Cumplir con una obligación legal
+  * Proteger y defender los derechos o la propiedad de la Compañía
+  * Prevenir o investigar posibles actos ilícitos relacionados con el Servicio
+  * Proteger la seguridad personal de los Usuarios del Servicio o del público
+  * Proteger contra la responsabilidad legal
+
+Seguridad de sus Datos Personales    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+La seguridad de sus Datos Personales es importante para nosotros, 
+pero recuerde que ningún método de transmisión a través de Internet, 
+ni método de almacenamiento electrónico es 100% seguro. Aunque nos esforzamos 
+por utilizar medios comercialmente aceptables para proteger sus Datos Personales, 
+no podemos garantizar su seguridad absoluta.
+
+Privacidad de los Niños 
+------------------
+
+Nuestro Servicio no está dirigido a personas menores de 13 años. No recopilamos 
+conscientemente información de identificación personal de personas menores de 13 años. 
+Si es un padre o tutor y sabe que su hijo nos ha proporcionado Datos Personales, 
+comuníquese con nosotros. Si nos enteramos de que hemos recopilado Datos Personales 
+de alguien menor de 13 años sin la verificación del consentimiento parental, tomamos 
+medidas para eliminar esa información de nuestros servidores.
+
+Si necesitamos basarnos en el consentimiento como base legal para procesar su 
+información y su país requiere el consentimiento de un padre, podemos requerir 
+el consentimiento de su padre antes de recopilar y usar esa información.
+
+Enlaces a Otros Sitios Web 
+-----------------------
+
+Nuestro Servicio puede contener enlaces a otros sitios web que no son operados 
+por nosotros. Si hace clic en un enlace de terceros, será dirigido al sitio del tercero. 
+Le recomendamos encarecidamente que revise la Política de Privacidad de cada sitio que visite.
+
+No tenemos control sobre ni asumimos ninguna responsabilidad por el contenido, las 
+políticas de privacidad o las prácticas de sitios web o servicios de terceros.
+
+Cambios en esta Política de Privacidad 
+------------------------------
+
+Podemos actualizar nuestra Política de Privacidad de vez en cuando. 
+Le notificaremos sobre cualquier cambio publicando la nueva Política de 
+Privacidad en esta página.
+
+Le informaremos por correo electrónico y/o mediante un aviso destacado en 
+nuestro Servicio, antes de que el cambio entre en vigor, y actualizaremos 
+la fecha de "Última actualización" en la parte superior de esta Política de 
+Privacidad.
+
+Se le recomienda revisar esta Política de Privacidad periódicamente para cualquier 
+cambio. Los cambios en esta Política de Privacidad son efectivos cuando se publican 
+en esta página.
+
+Contáctenos
+----------
+
+Si tiene alguna pregunta sobre esta Política de Privacidad, puede contactarnos:
+
+  * Por correo electrónico: santiagoegla@gmail.com
+

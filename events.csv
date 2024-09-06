@@ -1,3 +1,0 @@
-id,nombre,tipo_deporte,fecha,hora,lugar,ciudad,latitud,longitud,descripcion,modalidad_participacion,capacidad,organizador,costo_inscripcion,logo
-1,Sustentacion Aplicación,Desarrollo de Software,2024-09-02,13:00,Facultad de Minas,Medellin,6.274735919691621,-75.59260007551988,Sustentación de la aplicación Sportex en el aula de clase,Individual,20,seusse,Gratis,assets/uploads/events/logos/event_1.png
-2,Torneo Facultades UNAL MED,Fútbol,2024-09-05,15:00,Universidad Nacional Sede Medellin,Medellin,6.276041317998357,-75.58972311540006,Torneo de Futbol entre todas las facultades de la UnalMed,Equipos,8,seusse,Gratis,assets/uploads/events/logos/event_2.png

@@ -669,7 +669,7 @@ def navigate_to_page(page: Page, page_name: str):
                 Eventos creador por el usuario              
             """                
 
-            # Llama la función load_events de events.py para cargar todos los eventos
+            # Llama la función load_events de events.py para cargar todos los eventos como un dataframe
             events = load_events()
             # Guarda en una varible unicamente los eventos creados por el usuario actual y los retorna
             user_events = events[events['organizador'] == current_user['username']]
@@ -707,7 +707,6 @@ def navigate_to_page(page: Page, page_name: str):
             # Actualiza la pagina
             page.update()
             
-        
         # Función para actualizar los eventos del usuario logeado
         def update_user_events():
             """
@@ -716,18 +715,21 @@ def navigate_to_page(page: Page, page_name: str):
             Returns:
                 None               
             """    
-            # Llama la función load_user_events para tener los eventos creados por el usuario
+            # Llama la función load_user_events para tener los eventos creados por el usuario como un dataframe
             user_events = load_user_events()
             # Borrar los controles de la columna contenedora de los eventos
             user_events_column.controls.clear()
-            # Itera por cada evento creado por el usuario logeado y los muestra
+            # Itera por cada evento creado por el usuario logeado del dataframe y los muestra
             for _, event in user_events.iterrows():
                 # Contenedor horizontal tipo Row con los eventos creados por el usuario
                 event_row = ft.Row([
-                    ft.Text(event['nombre'], size=16),
-                    ft.Text(event['fecha'], size=14),
+                    ft.Text(f"• {event['nombre']}", size=16),
+                    ft.Text(f"({event['fecha']})", size=14),
+                    ft.Text(f"({event['estado']})", size=14),
                     # Boton para eliminar un evento que llama la función delete_event
-                    ft.ElevatedButton("Eliminar evento", on_click=lambda _, eid=event['id']: delete_event(eid))
+                    ft.ElevatedButton("Eliminar", on_click=lambda _, eid=event['id']: delete_event(eid)),
+                    # Boton para modificar un evento que llama la función navigate_to_page para redirigir a la pagina update event                    
+                    ft.ElevatedButton("Modificar", on_click=lambda e: navigate_to_page(page, "update_event"))
                 ])
                 # Añade los nuevos controles del Row creado anteriormente (contiene los eventos creados por el usuario)
                 user_events_column.controls.append(event_row)
@@ -792,7 +794,7 @@ def navigate_to_page(page: Page, page_name: str):
                     user_events_column 
                 ], 
                 # Alineamiento de contenedor vertical tipo Colum
-                alignment=ft.MainAxisAlignment.START, horizontal_alignment=ft.CrossAxisAlignment.START),
+                alignment=ft.MainAxisAlignment.START, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
                 ft.VerticalDivider(width=100),   
                 # Segundo contenedor vertical tipo Column dentro de Row           
                 ft.Column(
@@ -938,7 +940,7 @@ def navigate_to_page(page: Page, page_name: str):
             """    
             # Establecer color del texto del estado del evento
             if event['estado']=="Abierto":
-                status_color='green'
+                status_color=ft.colors.GREEN_900
             else:
                 status_color='red'
             # Crea un tipo GestureDetector            
@@ -964,7 +966,7 @@ def navigate_to_page(page: Page, page_name: str):
                             # Contiene fecha y hora del evento
                             ft.Text(f"{event['fecha']} - {event['hora']}", size=12),
                             # Contiene el estado del evento
-                            ft.Text(f"Estado: {event['estado']}", size=12, color=status_color),
+                            ft.Text(f"Estado: {event['estado']}", size=13, color=status_color, weight=ft.FontWeight.BOLD),
                             # Contiene descripción del evento
                             ft.Container(
                                 content=ft.Text(
@@ -1052,7 +1054,7 @@ def navigate_to_page(page: Page, page_name: str):
         )
 
         # Itera entre cada evento de todos los eventos del Dataframe
-        for index, event in events.iterrows():
+        for _, event in events.iterrows():
             # Para cada evento llama la función create_event card y crea una carta
             event_grid.controls.append(create_event_card(event))
 
@@ -1067,7 +1069,7 @@ def navigate_to_page(page: Page, page_name: str):
                 height=50,
                 bgcolor="blue",
                 color="white",
-                # Navega a pagina mi Perfil por medio de la función navigate_to_page
+                # Navega a pagina create_event por medio de la función navigate_to_page
                 on_click=lambda e: navigate_to_page(page, "create_event") 
         )
             # Contenido si hay un usuario activo
@@ -1341,6 +1343,9 @@ def navigate_to_page(page: Page, page_name: str):
             logo_button,
             create_button
         ]                     
+
+    elif page_name == "update_event":
+        pass
 
 
     # Añade a la pagina el encabezado y el contenido según la página en la que está ubicado

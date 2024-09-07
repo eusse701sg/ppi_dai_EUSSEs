@@ -43,7 +43,7 @@ Actualmente, existe una demanda continua de plataformas que faciliten la partici
 - **GeoPandas**: Para mostrar ubicaciones geográficas de eventos deportivos locales, instalaciones y clubes en mapas interactivos.
 
 ## 📞 Contacto
-Puedes conectarte conmigo a través de [LinkedIn](https://co.linkedin.com/in/santiago-eusse-gil-638b83220?trk=people-guest_people_search-card) o haciendo clic en el ícono a continuación:
+Puedes conectarte conmigo a través de LinkedIN haciendo clic en el ícono a continuación:
 
 <a href="https://co.linkedin.com/in/santiago-eusse-gil-638b83220?trk=people-guest_people_search-card" target="_blank">
   <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="30" height="30" style="vertical-align:middle; margin-right:10px;">

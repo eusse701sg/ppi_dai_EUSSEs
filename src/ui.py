@@ -687,9 +687,9 @@ def navigate_to_page(page: Page, page_name: str):
                 None               
             """    
 
-            # Llama la función load_events de events.py para cargar todos los eventos
+            # Llama la función load_events de events.py para cargar todos los eventos como un dataframe
             events = load_events()
-            # Selecciona los eventos a exepción del evento a eliminar
+            # Filtra las filas del dataframe exceptuando la fila del ID del evento que se va a eliminar
             events = events[events['id'] != event_id]
             # Guarda en el csv todos los eventos a excepción del evento a eliminar
             events.to_csv('data/events.csv', index=False)
@@ -921,7 +921,7 @@ def navigate_to_page(page: Page, page_name: str):
     # Pagina de eventos
     elif page_name == "events":
         
-        # Llama a la función load_events de events.py para obtener los eventos actuales
+        # Llama a la función load_events de events.py para obtener los eventos actuales como un dataframe
         events = load_events()
         # Llama a la función get_current_user de content.py para obtener el usuario acutal
         current_user = get_current_user()
@@ -1051,8 +1051,8 @@ def navigate_to_page(page: Page, page_name: str):
             run_spacing=10,
         )
 
-        # Itera entre cada evento de todos los eventos y convierte a cada uno en un diccionario
-        for event in events.to_dict('records'):
+        # Itera entre cada evento de todos los eventos del Dataframe
+        for index, event in events.iterrows():
             # Para cada evento llama la función create_event card y crea una carta
             event_grid.controls.append(create_event_card(event))
 
@@ -1090,7 +1090,7 @@ def navigate_to_page(page: Page, page_name: str):
     # Pagina de crear eventos
     elif page_name == "create_event":
 
-        # Llama a la función load_events de events.py para cargar los eventos actuales        
+        # Llama a la función load_events de events.py para cargar los eventos actuales como un dataframe      
         events = load_events()
         # Llama la función get_current_user para obtener el usuario actual
         current_user = get_current_user()

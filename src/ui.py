@@ -936,6 +936,11 @@ def navigate_to_page(page: Page, page_name: str):
             Returns:
                 ft.GestureDetector: Retorna una carta que reacciona al hacer click sobre ella               
             """    
+            # Establecer color del texto del estado del evento
+            if event['estado']=="Abierto":
+                status_color='green'
+            else:
+                status_color='red'
             # Crea un tipo GestureDetector            
             return ft.GestureDetector(
                 # Al clickear sobre el gesture detector llama la función show_event_details
@@ -958,6 +963,8 @@ def navigate_to_page(page: Page, page_name: str):
                             ),
                             # Contiene fecha y hora del evento
                             ft.Text(f"{event['fecha']} - {event['hora']}", size=12),
+                            # Contiene el estado del evento
+                            ft.Text(f"Estado: {event['estado']}", size=12, color=status_color),
                             # Contiene descripción del evento
                             ft.Container(
                                 content=ft.Text(
@@ -969,7 +976,7 @@ def navigate_to_page(page: Page, page_name: str):
                                 margin=ft.margin.only(top=5),
                                 expand=True,
                             ),
-                        ]),
+                        ],spacing=2),
                         width=200,
                         height=250
                     ),
@@ -1004,7 +1011,7 @@ def navigate_to_page(page: Page, page_name: str):
                             ft.Text(f"Hora: {event['hora']}"),
                             ft.Text(f"Lugar: {event['lugar']}"),
                             ft.Text(f"Ciudad: {event['ciudad']}"),
-                             
+                            ft.Text(f"Estado: {event['estado']}"),                             
                         ]),
                     ]),                  
                     ft.Text("Detalles:",size=30, weight=ft.FontWeight.BOLD),
@@ -1128,13 +1135,21 @@ def navigate_to_page(page: Page, page_name: str):
                 ft.dropdown.Option("Pago")
             ]
         )
+        # Lista desplegable para elegir el estado del evento (Al estar recién creado solo sale opción Abierto)
+        status_field = ft.Dropdown(
+            label="Estado",
+            width = 300,
+            options=[
+                ft.dropdown.Option("Abierto"),
+            ]
+        )
         # Campos con Dirección, barrio, estado, país y código postal
         street_field = ft.TextField(label="Dirección", width=300)
         neighborhood_field = ft.TextField(label="Barrio", width=300)
         state_field = ft.TextField(label="Estado/Provincia", width=300)
         country_field = ft.TextField(label="País", width=300)
         postal_code_field = ft.TextField(label="Código Postal", width=300)
-        # Definir logo actual del evento como ninguno
+        # Definir logo actual del evento como ninguno        
         logo_file_path = None
 
         # Función para cambiar el logo del evento    
@@ -1204,7 +1219,7 @@ def navigate_to_page(page: Page, page_name: str):
             # Validar campos llenados por el usuario
             if not all([name_field.value, sport_type_dropdown.value, date_field.value, time_field.value, 
                         place_field.value, city_field.value, description_field.value, participation_mode.value,
-                        capacity_field.value, registration_fee_field.value, street_field.value, 
+                        capacity_field.value, registration_fee_field.value, status_field.value, street_field.value, 
                         neighborhood_field.value, state_field.value, country_field.value, postal_code_field.value]):
                 page.show_snack_bar(ft.SnackBar(
                     # Si no se ha llenado los campos en su totalidad, avisa que debe hacerlo
@@ -1286,6 +1301,7 @@ def navigate_to_page(page: Page, page_name: str):
                         int(capacity_field.value), 
                         current_user['username'], 
                         registration_fee_field.value, 
+                        status_field.value,
                         new_logo_path)
             # Esperar 2 segundos
             time.sleep(2)
@@ -1316,6 +1332,7 @@ def navigate_to_page(page: Page, page_name: str):
             participation_mode,
             capacity_field,
             registration_fee_field,
+            status_field,
             street_field,
             neighborhood_field,
             state_field,

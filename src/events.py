@@ -28,7 +28,7 @@ def load_events():
             'id', 'nombre', 'tipo_deporte', 'fecha', 'hora',
             'lugar', 'ciudad', 'latitud', 'longitud',
             'descripcion', 'modalidad_participacion', 'capacidad',
-            'organizador', 'costo_inscripcion', 'logo'
+            'organizador', 'costo_inscripcion', 'estado', 'logo'
         ]
         # Convertir a dataframe
         df = pd.DataFrame(columns=columns)
@@ -37,7 +37,7 @@ def load_events():
         return df
 
 # Función para añadir un evento nuevo
-def add_event(event_id, name, sport_type, date, time, place, city, latitude, longitude, description, participation_mode, capacity, organizer, registration_fee, logo):
+def add_event(event_id, name, sport_type, date, time, place, city, latitude, longitude, description, participation_mode, capacity, organizer, registration_fee, status, logo):
     """
     Función para añadir un evento nuevo a una base de datos de eventos almacenada en un archivo CSV.
 
@@ -56,6 +56,7 @@ def add_event(event_id, name, sport_type, date, time, place, city, latitude, lon
         capacity (int): Número máximo de participantes permitidos.
         organizer (str): Nombre del organizador o entidad que organiza el evento.
         registration_fee (str): Costo de inscripción (Gratis o Pago)
+        status (str): Estado del evento (Abierto, Cerrado: En curso, Cerrado: Finalizado)
         logo (str): Ruta de la imagen del logo del evento.
 
     Returns:
@@ -78,7 +79,8 @@ def add_event(event_id, name, sport_type, date, time, place, city, latitude, lon
         'modalidad_participacion': participation_mode,
         'capacidad': capacity,
         'organizador': organizer,
-        'costo_inscripcion': registration_fee,        
+        'costo_inscripcion': registration_fee,  
+        'estado': status,      
         'logo': logo
     }
     # Añade al final del dataframe el nuevo evento

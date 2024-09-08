@@ -193,7 +193,24 @@ def navigate_to_page(page: Page, page_name: str):
     Returns:
         None
     """
+    
+    def save_current_event(event_id):
+        """
+        Guarda en la variable global current_event el id del evento seleccionado.
 
+        Args:
+            event_id (int): id del evento a guardar            
+
+        Returns:
+            None
+        """
+        # Se define la variable como global
+        global current_event
+        # Se cambia el valor de la variable global current_event y se guarda el ID del evento seleccionado
+        current_event = event_id
+        # Llama a la función navigate_to_page y allí se utiliza la variable current_event
+        navigate_to_page(page, "modify_event")
+    
     # Limpiar los controles y contenido actual
     page.controls.clear()   
     content = []
@@ -538,6 +555,7 @@ def navigate_to_page(page: Page, page_name: str):
 
     # Pagina del perfil    
     elif page_name == "profile":
+
         # Llama a la función get_current_user de content.py para obtener el usuario actual logeado.
         current_user = get_current_user() 
 
@@ -706,11 +724,11 @@ def navigate_to_page(page: Page, page_name: str):
             )),
             # Actualiza la pagina
             page.update()
-            
-        # Función para actualizar los eventos del usuario logeado
+                    
+        # Función para actualizar los eventos del usuario logeado (actualiza user_events_colum)
         def update_user_events():
             """
-            Función para actualizar los eventos del usuario logeado.        
+            Función para actualizar user_events_colum los eventos del usuario logeado.        
 
             Returns:
                 None               
@@ -726,10 +744,10 @@ def navigate_to_page(page: Page, page_name: str):
                     ft.Text(f"• {event['nombre']}", size=16),
                     ft.Text(f"({event['fecha']})", size=14),
                     ft.Text(f"({event['estado']})", size=14),
-                    # Boton para eliminar un evento que llama la función delete_event
+                    # Boton para eliminar un evento que llama la función delete_event con el id del evento
                     ft.ElevatedButton("Eliminar", on_click=lambda _, eid=event['id']: delete_event(eid)),
-                    # Boton para modificar un evento que llama la función navigate_to_page para redirigir a la pagina update event                    
-                    ft.ElevatedButton("Modificar", on_click=lambda e: navigate_to_page(page, "update_event"))
+                    # Boton para modificar un evento que llama la función save_current_event para guardar el id del evento seleccionado         
+                    ft.ElevatedButton("Modificar", on_click=lambda _, eid=event['id']: save_current_event(eid))
                 ])
                 # Añade los nuevos controles del Row creado anteriormente (contiene los eventos creados por el usuario)
                 user_events_column.controls.append(event_row)
@@ -738,6 +756,7 @@ def navigate_to_page(page: Page, page_name: str):
 
         # Columna contenedora de los eventos creados por el usuario
         user_events_column = ft.Column([], scroll=ft.ScrollMode.AUTO, height=300)
+        # Se llama la función update_user_events para modificar user_events_column
         update_user_events()
 
         # Definir file_picker para elegir una foto, es utilizado más tarde
@@ -1344,9 +1363,17 @@ def navigate_to_page(page: Page, page_name: str):
             create_button
         ]                     
 
-    elif page_name == "update_event":
-        pass
+    # Pagina para modificar un evento según el ID guardado
+    elif page_name == "modify_event":
+        # Llama la funcion  load_events de content.py para obtener la lista de eventos totales en un dataframe
+        events = load_events()
+        # Filtrar del dataframe para obtener todos los valores del id del evento seleccionado
+        event = events[events['id'] == current_event].iloc[0]
+        # Campos para ingresar valores del evento que además muestran el valor actual        
+        name_field = ft.TextField(label="Nombre del evento", width=300, value=event['nombre'])
+        
 
+        content = [name_field]
 
     # Añade a la pagina el encabezado y el contenido según la página en la que está ubicado
     page.controls.extend([create_header_row(page)] + content) 
@@ -1366,3 +1393,6 @@ def logout(page):
     # Llama la función navigate_to_page para redirigir al inicio
     navigate_to_page(page, "home")
     page.update()
+
+# Inicializar id del evento actual seleccionado
+current_event = None

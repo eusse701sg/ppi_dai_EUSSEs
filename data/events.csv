@@ -1,2 +1,3 @@
 id,nombre,tipo_deporte,fecha,hora,lugar,ciudad,latitud,longitud,descripcion,modalidad_participacion,capacidad,organizador,costo_inscripcion,estado,logo
 1,Campeonato Futbol-11 UNALMED,Fútbol,2024-11-25,16:00,Universidad Nacional Sede Medellin,Medellin,6.3001235,-75.5664478,Torneo Futbol 11 entre las facultades de la Unal Med,Equipos,8,sportex,Gratis,Abierto,uploads\events\logos\event_1.png
+2,prueba,Voleibol,123,1231,123,Bello,6.3422612,-75.5548817,asdas,Equipos,1,sportex,Pago,Abierto,uploads/events/logos/evento_default.png

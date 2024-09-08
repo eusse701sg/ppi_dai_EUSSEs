@@ -192,6 +192,7 @@ def change_password(old_password, new_password):
                     file.write(line+ "\n") 
         return password_changed
 
+# Función para guardar la foto de perfil y almacenarla en una ubicación específica
 def save_profile_picture(file_path):
     """
     Guarda la imagen de perfil de un usuario, redimensionándola y almacenándola en una ubicación específica.
@@ -231,7 +232,8 @@ def save_profile_picture(file_path):
     except Exception as e:
         print(f"Error al guardar la imagen de perfil: {e}")
         return False
-    
+
+# Función para guardar el logo del evento    
 def save_event_logo(file_path):
     """
     Guarda el logotipo de un evento, asignándole un nombre basado en el siguiente ID disponible.

@@ -7,7 +7,7 @@ from geopy.geocoders import Nominatim
 from PIL import Image as PILImage
 from flet import Page, Image
 # Importar funciones necesarias de events.py
-from events import load_events, add_event
+from events import load_events, add_event, modify_event
 # Importar funciones necesarias de content.py
 from content import read_privacy_policy, register_user, authenticate_user, change_password, get_current_user, set_current_user, save_profile_picture, save_event_logo
 
@@ -214,6 +214,7 @@ def navigate_to_page(page: Page, page_name: str):
     # Limpiar los controles y contenido actual
     page.controls.clear()   
     content = []
+    page.update()
 
     # Pagina Contactame    
     if page_name == "contact": 
@@ -555,7 +556,7 @@ def navigate_to_page(page: Page, page_name: str):
 
     # Pagina del perfil    
     elif page_name == "profile":
-
+        page.update()
         # Llama a la función get_current_user de content.py para obtener el usuario actual logeado.
         current_user = get_current_user() 
 
@@ -636,7 +637,7 @@ def navigate_to_page(page: Page, page_name: str):
             
             try:
                 # Intentar abrir el archivo como imagen
-                with Image.open(file_path) as img:
+                with PILImage.open(file_path) as img:
                     # Si llega aquí, es una imagen válida
                     pass
             except Exception:
@@ -651,6 +652,7 @@ def navigate_to_page(page: Page, page_name: str):
             if save_profile_picture(file_path):
                 # Llama la función update_profile_picture para actualizar la foto de perfil según la nueva ruta
                 update_profile_picture(file_path)
+                page.update()
                 page.show_snack_bar(ft.SnackBar(
                     # Aviso de que la foto se cambió con exito
                     content=ft.Text("Foto de perfil cambiada con éxito.", size=20, color="white"),
@@ -942,6 +944,7 @@ def navigate_to_page(page: Page, page_name: str):
     # Pagina de eventos
     elif page_name == "events":
         
+        page.update()
         # Llama a la función load_events de events.py para obtener los eventos actuales como un dataframe
         events = load_events()
         # Llama a la función get_current_user de content.py para obtener el usuario acutal
@@ -1365,15 +1368,328 @@ def navigate_to_page(page: Page, page_name: str):
 
     # Pagina para modificar un evento según el ID guardado
     elif page_name == "modify_event":
+       
         # Llama la funcion  load_events de content.py para obtener la lista de eventos totales en un dataframe
         events = load_events()
-        # Filtrar del dataframe para obtener todos los valores del id del evento seleccionado
+        # Filtrar del dataframe para obtener el evento del id seleeccionado junto con todos sus valores 
         event = events[events['id'] == current_event].iloc[0]
+        
         # Campos para ingresar valores del evento que además muestran el valor actual        
         name_field = ft.TextField(label="Nombre del evento", width=300, value=event['nombre'])
-        
+        # Deportes totales
+        sport_types = ["Fútbol", "Baloncesto", "Tenis", "Voleibol", "Natación", "Atletismo", "Otro"]
+        # Lista desplegable para elegir un deporte de lal ista
+        sport_type_dropdown = ft.Dropdown(
+            label="Tipo de deporte",
+            width=300,
+            options=[ft.dropdown.Option(sport) for sport in sport_types],
+            value=event['tipo_deporte']
+        )
+        # Campos fecha, hora, lugar, ciudad, descripción        
+        date_field = ft.TextField(label="Fecha (YYYY-MM-DD)", width=300, value=event['fecha'])
+        time_field = ft.TextField(label="Hora (HH:MM)", width=300, value=event['hora'])
+        place_field = ft.TextField(label="Lugar", width=300, value=event['lugar'])
+        city_field = ft.TextField(label="Ciudad", width=300, value=event['ciudad'])
+        description_field = ft.TextField(label="Descripción", width=300, multiline=True, max_lines=5, value=event['descripcion'])
+        # Lista desplegable para elegir la modalidad de participación (Individual o en Equipos)
+        participation_mode = ft.Dropdown(
+            label="Modalidad de participación",
+            width=300,
+            options=[
+                ft.dropdown.Option("Individual"),
+                ft.dropdown.Option("Equipos")
+            ],
+            value=event['modalidad_participacion']
+        )
+        # Capacidad del evento
+        capacity_field = ft.TextField(label="Capacidad", width=300, value=int(event['capacidad']))
+        # Lista desplegable para elegir el costo de la inscripción (Gratis o Pago)
+        registration_fee_field = ft.Dropdown(
+            label="Costo de inscripción",
+            width=300,
+            options=[
+                ft.dropdown.Option("Gratis"),
+                ft.dropdown.Option("Pago")
+            ],
+            value=event['costo_inscripcion']
+        )
+        # Lista desplegable para elegir el estado del evento deportivo (Abierto, en curso, finalizado)
+        status_field = ft.Dropdown(
+            label="Estado",
+            width=300,
+            options=[
+                ft.dropdown.Option("Abierto"),
+                ft.dropdown.Option("En curso"),
+                ft.dropdown.Option("Finalizado"),
+            ],
+            value=event['estado']
+        )        
 
-        content = [name_field]
+        # Campos con Dirección, Barrio, Estado, Pais y Código postal
+        street_field = ft.TextField(label="Dirección", width=300)
+        neighborhood_field = ft.TextField(label="Barrio", width=300)
+        state_field = ft.TextField(label="Estado/Provincia", width=300)
+        country_field = ft.TextField(label="País", width=300)
+        postal_code_field = ft.TextField(label="Código Postal", width=300)
+
+        # Logo actual
+        current_logo = ft.Image(src=event['logo'], width=100, height=100)
+
+        # Función para actualizar el logo
+        def handle_logo_change(e: ft.FilePickerResultEvent):
+            """
+            Función para actualizar el logo del evento.
+
+            Args:
+                FilePicker: La función es llamada al seleccionar un filepicker para subir imagenes
+            Returns:
+                None              
+            """   
+            nonlocal current_logo
+
+            # Si la cantidad de imagenes es 0, hace return
+            if not e.files or len(e.files) == 0:
+                return
+            
+            # Divide la ruta en path y nombre
+            file_path = e.files[0].path
+            file_name = e.files[0].name
+
+            # Formatos válidos de imagenes
+            valid_extensions = [".jpg", ".jpeg", ".png", ".gif", ".jfif", ".avif"]
+            # Obtiene el formato del logo subido
+            file_extension = os.path.splitext(file_name)[1].lower()
+
+            # Si el formato del logo no está en la lista de formatos admitidos
+            if file_extension not in valid_extensions:
+                page.show_snack_bar(ft.SnackBar(
+                    content=ft.Text("El archivo seleccionado no es una imagen válida", size=20, color="red"),
+                    bgcolor="lightcoral",
+                    duration=3000 
+                ))
+                return
+            
+            # Tratar de abrir la ruta como imagen
+            try:
+                with PILImage.open(file_path) as img:
+                    # Guardar ruta local del archivo en la variable current logo
+                    current_logo = file_path
+                    page.update()                    
+                    page.show_snack_bar(ft.SnackBar(
+                        # Aviso que se actualizó
+                        content=ft.Text("Logo actualizado", size=20, color="white"),
+                        bgcolor="lightgreen",
+                        duration=3000 
+                    ))                    
+            except Exception as e:
+                page.show_snack_bar(ft.SnackBar(
+                    # Aviso de error al procesar
+                    content=ft.Text(f"Error al procesar la imagen: {str(e)}", size=20, color="red"),
+                    bgcolor="lightcoral",
+                    duration=3000 
+                ))
+
+        # File picker para seleccionar una imagen que llama la función  handle_logo_change
+        file_picker = ft.FilePicker(on_result=handle_logo_change)
+        page.overlay.append(file_picker)
+
+        # Boton de cambiar logo que llama al file picker definido anteriormente
+        logo_button = ft.ElevatedButton("Cambiar logo", on_click=lambda _: file_picker.pick_files(allow_multiple=False))
+
+        # Funcion para guardar el logotipo del evento
+        def update_event_logo(file_path):
+            """
+            guarda el logotipo actualizado de un evento
+
+            Args:
+                file_path (str): Ruta del archivo de imagen del logotipo del evento.
+            
+            Returns:
+                str | None: Devuelve la ruta relativa desde la carpeta 'uploads' donde se guardó el
+                logotipo si el proceso fue exitoso, o `None` en caso de error.
+            """
+            # Llama la funcion  load_events para obtener la lista de eventos totales en un dataframe
+            events = load_events()
+            # Filtrar del dataframe para obtener todos los valores del id del evento seleccionado
+            event = events[events['id'] == current_event].iloc[0]
+
+            # Obtener el nombre del archivo existente            
+            existing_logo_path = event['logo']
+            existing_logo_name = os.path.basename(existing_logo_path)
+            
+            # Definir carpeta destino
+            destination_folder = "assets/uploads/events/logos"
+
+            # Comprobar si el logo actual es el de evento por default
+            if existing_logo_name == "evento_default.png":
+                # Si es el logo por defecto, genera un nuevo archivo de imagen con el id correspondiente
+                new_file_name = f"event_{event['id']}.png"
+                destination_path = os.path.join(destination_folder, new_file_name)
+
+            else:
+                # Si no es el logo por defecto, guarda el nuevo logo en la misma ruta para sobreescribirlo conservando el mismo nombre
+                destination_path = os.path.join(destination_folder, existing_logo_name)
+
+            # Intentar guardar el logo
+            try:
+                # Abrir la imagen seleccionada
+                with PILImage.open(file_path) as img:
+                    # Guardar la imagen en formato PNG
+                    img.save(destination_path, format='PNG')
+
+                # Ruta base que se quitará de la ruta completa
+                base_path = "assets"
+                # Obtener ruta relativa desde la carpeta 'uploads' removiendo la carpeta base
+                relative_path = os.path.relpath(destination_path, base_path)
+                # Retorna la ruta relativa desde la carpeta 'uploads"
+                return relative_path
+            
+            # Si no se pudo guardar el logo
+            except Exception as e:
+                print(f"Error al guardar logo de evento: {e}")
+                return None     
+            
+        # Función para actualizar un evento
+        def update_event(e):
+            """
+            Actualiza el evento en el csv
+
+            Args:
+                e (EventCallable): Se llama al clickear en el botón guardar cambios
+            
+            Returns:
+                None            
+            """            
+            nonlocal current_logo
+            # Validar campos llenados por el usuario
+            if not all([name_field.value, sport_type_dropdown.value, date_field.value, time_field.value, 
+                        place_field.value, city_field.value, description_field.value, participation_mode.value,
+                        capacity_field.value, registration_fee_field.value, status_field.value, street_field.value, 
+                        neighborhood_field.value, state_field.value, country_field.value, postal_code_field.value]):
+                page.show_snack_bar(ft.SnackBar(
+                    # Si no se ha llenado los campos en su totalidad, avisa que debe hacerlo
+                    content=ft.Text("Por favor, complete todos los campos", size=20, color="red"),
+                    bgcolor="lightcoral",
+                    duration=3000 
+                ))
+                return            
+
+            # Obtener coordenadas con la librería Nominatim, geolocator y geocode
+            geolocator = Nominatim(user_agent="sportex_app")
+
+            # Intenta obtener coordenadas según calle, barrio, ciudad, estado, pais, codigo postal ingresados por el usuario              
+            try:
+                location = geolocator.geocode(
+                    query={
+                        'street': street_field.value,
+                        'neighborhood': neighborhood_field.value,
+                        'city': city_field.value,
+                        'state': state_field.value,
+                        'country': country_field.value,
+                        'postal_code': postal_code_field.value
+                    }
+                )
+                # Si obtiene coordenadas
+                if location:
+                    latitude, longitude = location.latitude, location.longitude
+                # Si no se pudo obtener las coordenadas
+                else:
+                    raise Exception("No se pudo obtener la ubicación")
+            except Exception as e:
+                page.show_snack_bar(ft.SnackBar(
+                    # Aviso de que no se pudo obtener cordenads
+                    content=ft.Text(f"Error al obtener coordenadas: {str(e)}", size=20, color="red"),
+                    bgcolor="lightcoral",
+                    duration=3000 
+                ))
+                return
+            
+            # Verificar si se cambió el logo al modificar el evento o se dejó el mismo anterior
+            logo_changed = isinstance(current_logo, str) and current_logo != event['logo']
+            # Si fue cambiado
+            if logo_changed:
+                # Llama la función update_event_logo
+                new_logo_path = update_event_logo(current_logo)
+
+                # Si guarda el logo en assets
+                if new_logo_path:
+                    page.show_snack_bar(ft.SnackBar(
+                        # Aviso de que se guardó el logo
+                        content=ft.Text("Logo guardado con éxito.", size=20, color="white"),
+                        bgcolor="lightgreen",
+                        duration=3000 
+                ))
+            # Si no se pudo guardar el logo
+                else:
+                    page.show_snack_bar(ft.SnackBar(
+                        # Aviso de que hubo un error guardando el logo
+                        content=ft.Text("Error al guardar logo del evento.", size=20, color="red"),
+                        bgcolor="lightcoral",
+                        duration=3000
+                    ))
+                    return
+            # Si no se cambió el logo al modificar el evento
+            else:
+                # Conservar el logo actual
+                new_logo_path = event['logo']
+
+            # Llama la función modify_event de events.py para actualizar el evento en el csv con los valores diligenciados por el usuario
+            modify_event(event['id'],
+                         name_field.value,
+                         sport_type_dropdown.value,
+                         date_field.value,
+                         time_field.value,
+                         place_field.value,
+                         city_field.value,
+                         latitude,
+                         longitude,
+                         description_field.value,
+                         participation_mode.value,
+                         int(capacity_field.value),
+                         registration_fee_field.value,
+                         status_field.value,
+                         new_logo_path
+                         )
+
+            # Esperar 2 segundos
+            time.sleep(2)
+            page.show_snack_bar(ft.SnackBar(
+                # Aviso de que el evento fue modificado
+                content=ft.Text("Evento modificado exitosamente", size=20, color="white"),
+                bgcolor="lightgreen",
+                duration=3000 
+            ))
+            time.sleep(1)
+            # Al terminar llama la función navigate_to_page para redirigir a la pagina "Perfil"
+            navigate_to_page(page, "profile")
+
+        # Boton para guardar los cambios
+        save_button = ft.ElevatedButton("Guardar cambios", on_click=update_event)
+        # Boton para cancelar
+        cancel_button = ft.ElevatedButton("Cancelar", on_click=lambda _: navigate_to_page(page, "profile"))
+
+        content = [
+            ft.Text("Modificar Evento", size=30, weight=ft.FontWeight.BOLD),
+            name_field,
+            sport_type_dropdown,
+            date_field,
+            time_field,
+            place_field,
+            city_field,
+            description_field,
+            participation_mode,
+            capacity_field,
+            registration_fee_field,
+            status_field,
+            street_field,
+            neighborhood_field,
+            state_field,
+            country_field,
+            postal_code_field,            
+            ft.Row([current_logo, logo_button]),
+            save_button,
+            cancel_button
+        ]
 
     # Añade a la pagina el encabezado y el contenido según la página en la que está ubicado
     page.controls.extend([create_header_row(page)] + content) 

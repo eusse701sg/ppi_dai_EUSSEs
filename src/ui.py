@@ -330,7 +330,7 @@ def navigate_to_page(page: Page, page_name: str):
                 ))
 
         # Actualizar estado del botón basado en el checkbox
-        def toggle_resgister_button(e):
+        def toggle_register_button(e):
             """
             Función para actualizar el estado del botón basado en el checkbox.
 
@@ -438,7 +438,7 @@ def navigate_to_page(page: Page, page_name: str):
         )
 
         # Llama la función toggle_register_button para habilitar el botón de registrar
-        privacy_checkbox.on_change = toggle_resgister_button       
+        privacy_checkbox.on_change = toggle_register_button       
     
 
         # Botón para ver Políticas de privacidad
@@ -1114,6 +1114,60 @@ def navigate_to_page(page: Page, page_name: str):
     # Pagina de crear eventos
     elif page_name == "create_event":
 
+        # Función para mostrar información sobre como obtener la latitud y la longitud
+        def show_help_latlong(_):
+            """
+            Muestra información sobre como obtener latitud y longitud en un objeto 'AlertDialog'.
+
+            Args:
+                Se llama al momento de clickear el botón "¿Cómo saber latitud y longitud?"
+            
+            Returns:
+                None
+            """            
+
+            # Crea objeto alertdialog
+            dialog = ft.AlertDialog(
+                modal = True,
+                # Titulo
+                title = ft.Text("¿Cómo saber latitud y longitud?"),
+                # Contenido
+                content = ft.Container(
+                    width=600,
+                    height=700,
+                    content=ft.Column(
+                        [   ft.Text("1. En tu teléfono o Computador, abre la aplicación Google Maps.\n2. Clickea o Mantén pulsada un área del mapa que no esté etiquetada para colocar ahí un marcador rojo.\n3. Verás las coordenadas en el cuadro de búsqueda.",
+                                    size=14),
+                            # Imagen de ejemplo
+                            ft.Image(src="uploads/events/Ayuda_latitud_longitud.jpg", width=900,height=400, fit=ft.ImageFit.CONTAIN),
+                            ft.Text("En la imagen podrá visualizar la latitud y la longitud separadas por coma.\nEn este caso\nLatitud: 6.261306\nLongitud: -75.575243",
+                                    size=14)],
+                                    # Alineamiento al comienzo (izquierda)
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment= ft.CrossAxisAlignment.START,
+                                    # Permitir scroll
+                                    scroll="auto",
+                                    spacing=3)            
+                ),
+                actions=[
+                    # Boton cerrar que al clickear llama la función close_dialog
+                    ft.TextButton("Cerrar", on_click=lambda _: close_dialog(dialog))
+                ]
+            )
+            page.dialog = dialog
+            # Abre el dialog
+            dialog.open = True
+            page.update()          
+
+        # Funcion para cerrar el objeto dialog que genera show_help_latlong
+        def close_dialog(dialog):
+            """
+            Cierra el objeto dialog al clickear en el botón Cerrar
+            """
+            dialog.open= False
+            page.update()
+
+
         # Llama a la función load_events de events.py para cargar los eventos actuales como un dataframe      
         events = load_events()
         # Llama la función get_current_user para obtener el usuario actual
@@ -1167,12 +1221,15 @@ def navigate_to_page(page: Page, page_name: str):
                 ft.dropdown.Option("Abierto"),
             ]
         )
-        # Campos con Dirección, barrio, estado, país y código postal
-        street_field = ft.TextField(label="Dirección", width=300)
-        neighborhood_field = ft.TextField(label="Barrio", width=300)
-        state_field = ft.TextField(label="Estado/Provincia", width=300)
-        country_field = ft.TextField(label="País", width=300)
-        postal_code_field = ft.TextField(label="Código Postal", width=300)
+
+        # Campos de latitud y longitud
+        latitude_field = ft.TextField(label="Latitud", width=300)
+        longitude_field = ft.TextField(label="Longitud", width=300)
+
+        # Boton para leer ayuda sobre cómo obtener la latitud y la longitud
+        help_latlong_button = ft.TextButton("¿Cómo saber latitud y longitud?")
+        help_latlong_button.on_click = show_help_latlong
+
         # Definir logo actual del evento como ninguno        
         logo_file_path = None
 
@@ -1243,8 +1300,8 @@ def navigate_to_page(page: Page, page_name: str):
             # Validar campos llenados por el usuario
             if not all([name_field.value, sport_type_dropdown.value, date_field.value, time_field.value, 
                         place_field.value, city_field.value, description_field.value, participation_mode.value,
-                        capacity_field.value, registration_fee_field.value, status_field.value, street_field.value, 
-                        neighborhood_field.value, state_field.value, country_field.value, postal_code_field.value]):
+                        capacity_field.value, registration_fee_field.value, status_field.value,
+                        latitude_field.value, longitude_field.value]):
                 page.show_snack_bar(ft.SnackBar(
                     # Si no se ha llenado los campos en su totalidad, avisa que debe hacerlo
                     content=ft.Text("Por favor, complete todos los campos", size=20, color="red"),
@@ -1253,35 +1310,48 @@ def navigate_to_page(page: Page, page_name: str):
                 ))
                 return
 
-            # Obtener coordenadas con la librería Nominatim, geolocator y geocode
-            geolocator = Nominatim(user_agent="sportex_app")
-
-            # Intenta obtener coordenadas según calle, barrio, ciudad, estado, pais, codigo postal ingresados por el usuario              
             try:
-                location = geolocator.geocode(
-                    query={
-                        'street': street_field.value,
-                        'neighborhood': neighborhood_field.value,
-                        'city': city_field.value,
-                        'state': state_field.value,
-                        'country': country_field.value,
-                        'postal_code': postal_code_field.value
-                    }
-                )
-                # Si obtiene coordenadas
-                if location:
-                    latitude, longitude = location.latitude, location.longitude
-                # Si no se pudo obtener las coordenadas
-                else:
-                    raise Exception("No se pudo obtener la ubicación")
-            except Exception as e:
+                # Intentar convertir el valor del campo a entero
+                capacity_field.value = int(capacity_field.value)
+                # Verificar si la capacidad es menor o igual a 0
+                if capacity_field.value <= 0:
+                    raise ValueError
+            except ValueError as e:                
                 page.show_snack_bar(ft.SnackBar(
-                    # Aviso de que no se pudo obtener cordenads
-                    content=ft.Text(f"Error al obtener coordenadas: {str(e)}", size=20, color="red"),
+                    # Aviso de que la capacidad debe ser un número entero mayor a 0
+                    content=ft.Text("La capacidad debe ser un número entero mayor a 0", size=20, color="red"),
                     bgcolor="lightcoral",
                     duration=3000 
                 ))
                 return
+
+            try:
+                # Intentar convertir el valor de latitud a float
+                latitude_field.value = float(latitude_field.value)
+                
+                # Verificar que la latitud esté dentro del rango permitido
+                if not (-90 <= latitude_field.value <= 90):
+                    raise ValueError("La latitud debe estar entre -90 y 90")
+                
+                # Intentar convertir el valor de longitud a float
+                longitude_field.value = float(longitude_field.value)
+                
+                # Verificar que la longitud esté dentro del rango permitido
+                if not (-180 <= longitude_field.value <= 180):
+                    raise ValueError("La longitud debe estar entre -180 y 180")
+            
+            except ValueError as e:
+                # Mostrar un mensaje de error si ocurre una excepción
+                error_message = str(e)
+                if "could not convert string to float" in error_message:
+                    error_message = "La latitud y la longitud deben ser números decimales."
+
+                page.show_snack_bar(ft.SnackBar(
+                    content=ft.Text(error_message, size=20, color="red"),
+                    bgcolor="lightcoral",
+                    duration=3000
+                ))
+                return                           
 
             # Guardar logo si existe un path al haber sido guardado, en caso contrario fue definido como None anteriormente
             if logo_file_path:
@@ -1318,8 +1388,8 @@ def navigate_to_page(page: Page, page_name: str):
                         time_field.value, 
                         place_field.value, 
                         city_field.value, 
-                        latitude, 
-                        longitude, 
+                        latitude_field.value, 
+                        longitude_field.value, 
                         description_field.value, 
                         participation_mode.value, 
                         int(capacity_field.value), 
@@ -1357,18 +1427,69 @@ def navigate_to_page(page: Page, page_name: str):
             capacity_field,
             registration_fee_field,
             status_field,
-            street_field,
-            neighborhood_field,
-            state_field,
-            country_field,
-            postal_code_field,
+            help_latlong_button,
+            latitude_field,
+            longitude_field,
             logo_button,
             create_button
         ]                     
 
     # Pagina para modificar un evento según el ID guardado
     elif page_name == "modify_event":
-       
+        
+        # Función para mostrar información sobre como obtener la latitud y la longitud
+        def show_help_latlong(_):
+            """
+            Muestra información sobre como obtener latitud y longitud en un objeto 'AlertDialog'.
+
+            Args:
+                Se llama al momento de clickear el botón "¿Cómo saber latitud y longitud?"
+            
+            Returns:
+                None
+            """            
+
+            # Crea objeto alertdialog
+            dialog = ft.AlertDialog(
+                modal = True,
+                # Titulo
+                title = ft.Text("¿Cómo saber latitud y longitud?"),
+                # Contenido
+                content = ft.Container(
+                    width=600,
+                    height=700,
+                    content=ft.Column(
+                        [   ft.Text("1. En tu teléfono o Computador, abre la aplicación Google Maps.\n2. Clickea o Mantén pulsada un área del mapa que no esté etiquetada para colocar ahí un marcador rojo.\n3. Verás las coordenadas en el cuadro de búsqueda.",
+                                    size=14),
+                            #Imagen de ejemplo
+                            ft.Image(src="uploads/events/Ayuda_latitud_longitud.jpg", width=900,height=400, fit=ft.ImageFit.CONTAIN),
+                            ft.Text("En la imagen podrá visualizar la latitud y la longitud separadas por coma.\nEn este caso\nLatitud: 6.261306\nLongitud: -75.575243",
+                                    size=14)],
+                                    # Alineamiento al comienzo
+                                    alignment=ft.MainAxisAlignment.START,
+                                    horizontal_alignment= ft.CrossAxisAlignment.START,
+                                    # Permitir scroll
+                                    scroll="auto",
+                                    spacing=3)            
+                ),
+                actions=[
+                    # Boton cerrar que al clickear llama la función close_dialog
+                    ft.TextButton("Cerrar", on_click=lambda _: close_dialog(dialog))
+                ]
+            )
+            page.dialog = dialog
+            # Abre el dialog
+            dialog.open = True
+            page.update()          
+
+        # Funcion para cerrar el objeto dialog que genera show_help_latlong
+        def close_dialog(dialog):
+            """
+            Cierra el objeto dialog al clickear en el botón Cerrar
+            """
+            dialog.open= False
+            page.update()
+
         # Llama la funcion  load_events de content.py para obtener la lista de eventos totales en un dataframe
         events = load_events()
         # Filtrar del dataframe para obtener el evento del id seleeccionado junto con todos sus valores 
@@ -1401,7 +1522,7 @@ def navigate_to_page(page: Page, page_name: str):
             ],
             value=event['modalidad_participacion']
         )
-        # Capacidad del evento
+        # Campo Capacidad del evento
         capacity_field = ft.TextField(label="Capacidad", width=300, value=int(event['capacidad']))
         # Lista desplegable para elegir el costo de la inscripción (Gratis o Pago)
         registration_fee_field = ft.Dropdown(
@@ -1425,12 +1546,14 @@ def navigate_to_page(page: Page, page_name: str):
             value=event['estado']
         )        
 
-        # Campos con Dirección, Barrio, Estado, Pais y Código postal
-        street_field = ft.TextField(label="Dirección", width=300)
-        neighborhood_field = ft.TextField(label="Barrio", width=300)
-        state_field = ft.TextField(label="Estado/Provincia", width=300)
-        country_field = ft.TextField(label="País", width=300)
-        postal_code_field = ft.TextField(label="Código Postal", width=300)
+        # Boton para leer ayuda sobre cómo obtener la latitud y la longitud
+        help_latlong_button = ft.TextButton("¿Cómo saber latitud y longitud?")
+        help_latlong_button.on_click = show_help_latlong
+
+
+        # Campos Latitud y longitud
+        latitude_field = ft.TextField(label="Latitud", width=300, value=event['latitud'])
+        longitude_field = ft.TextField(label="Longitud", width=300, value=event['longitud'])
 
         # Logo actual
         current_logo = ft.Image(src=event['logo'], width=100, height=100)
@@ -1564,45 +1687,58 @@ def navigate_to_page(page: Page, page_name: str):
             # Validar campos llenados por el usuario
             if not all([name_field.value, sport_type_dropdown.value, date_field.value, time_field.value, 
                         place_field.value, city_field.value, description_field.value, participation_mode.value,
-                        capacity_field.value, registration_fee_field.value, status_field.value, street_field.value, 
-                        neighborhood_field.value, state_field.value, country_field.value, postal_code_field.value]):
+                        capacity_field.value, registration_fee_field.value, status_field.value, latitude_field.value,
+                        longitude_field.value]):
                 page.show_snack_bar(ft.SnackBar(
                     # Si no se ha llenado los campos en su totalidad, avisa que debe hacerlo
                     content=ft.Text("Por favor, complete todos los campos", size=20, color="red"),
                     bgcolor="lightcoral",
                     duration=3000 
                 ))
-                return            
+                return
 
-            # Obtener coordenadas con la librería Nominatim, geolocator y geocode
-            geolocator = Nominatim(user_agent="sportex_app")
-
-            # Intenta obtener coordenadas según calle, barrio, ciudad, estado, pais, codigo postal ingresados por el usuario              
             try:
-                location = geolocator.geocode(
-                    query={
-                        'street': street_field.value,
-                        'neighborhood': neighborhood_field.value,
-                        'city': city_field.value,
-                        'state': state_field.value,
-                        'country': country_field.value,
-                        'postal_code': postal_code_field.value
-                    }
-                )
-                # Si obtiene coordenadas
-                if location:
-                    latitude, longitude = location.latitude, location.longitude
-                # Si no se pudo obtener las coordenadas
-                else:
-                    raise Exception("No se pudo obtener la ubicación")
-            except Exception as e:
+                # Intentar convertir el valor del campo a entero
+                capacity_field.value = int(capacity_field.value)
+                # Verificar si la capacidad es menor o igual a 0
+                if capacity_field.value <= 0:
+                    raise ValueError
+            except ValueError as e:                
                 page.show_snack_bar(ft.SnackBar(
-                    # Aviso de que no se pudo obtener cordenads
-                    content=ft.Text(f"Error al obtener coordenadas: {str(e)}", size=20, color="red"),
+                    # Aviso de que la capacidad debe ser un número entero mayor a 0
+                    content=ft.Text("La capacidad debe ser un número entero mayor a 0", size=20, color="red"),
                     bgcolor="lightcoral",
                     duration=3000 
                 ))
                 return
+            
+            try:
+                # Intentar convertir el valor de latitud a float
+                latitude_field.value = float(latitude_field.value)
+                
+                # Verificar que la latitud esté dentro del rango permitido
+                if not (-90 <= latitude_field.value <= 90):
+                    raise ValueError("La latitud debe estar entre -90 y 90")
+                
+                # Intentar convertir el valor de longitud a float
+                longitude_field.value = float(longitude_field.value)
+                
+                # Verificar que la longitud esté dentro del rango permitido
+                if not (-180 <= longitude_field.value <= 180):
+                    raise ValueError("La longitud debe estar entre -180 y 180")
+            
+            except ValueError as e:
+                # Mostrar un mensaje de error si ocurre una excepción
+                error_message = str(e)
+                if "could not convert string to float" in error_message:
+                    error_message = "La latitud y la longitud deben ser números decimales."
+
+                page.show_snack_bar(ft.SnackBar(
+                    content=ft.Text(error_message, size=20, color="red"),
+                    bgcolor="lightcoral",
+                    duration=3000
+                ))
+                return                                         
             
             # Verificar si se cambió el logo al modificar el evento o se dejó el mismo anterior
             logo_changed = isinstance(current_logo, str) and current_logo != event['logo']
@@ -1641,8 +1777,8 @@ def navigate_to_page(page: Page, page_name: str):
                          time_field.value,
                          place_field.value,
                          city_field.value,
-                         latitude,
-                         longitude,
+                         latitude_field.value,
+                         longitude_field.value,
                          description_field.value,
                          participation_mode.value,
                          int(capacity_field.value),
@@ -1681,11 +1817,9 @@ def navigate_to_page(page: Page, page_name: str):
             capacity_field,
             registration_fee_field,
             status_field,
-            street_field,
-            neighborhood_field,
-            state_field,
-            country_field,
-            postal_code_field,            
+            help_latlong_button,
+            latitude_field,
+            longitude_field,           
             ft.Row([current_logo, logo_button]),
             save_button,
             cancel_button

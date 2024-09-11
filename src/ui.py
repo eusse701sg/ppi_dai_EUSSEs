@@ -3,7 +3,6 @@ import flet as ft
 import pandas as pd
 import time
 import os
-from geopy.geocoders import Nominatim
 from PIL import Image as PILImage
 from flet import Page, Image
 # Importar funciones necesarias de events.py

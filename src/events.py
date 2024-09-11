@@ -1,7 +1,6 @@
 #Importar librerias necesarias
 import pandas as pd
 import os
-import geopandas as gdp
 
 # Ruta en la que se guardan los eventos tipo csv
 csv_path = 'data/events.csv'

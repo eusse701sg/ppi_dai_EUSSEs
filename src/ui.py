@@ -1,10 +1,14 @@
 # Importar librerías necesarias
 import flet as ft
 import pandas as pd
+import geopandas as gpd
+from shapely.geometry import Point
 import time
 import os
 from PIL import Image as PILImage
 from flet import Page, Image
+from geopy.geocoders import Nominatim
+from pyproj import CRS
 # Importar funciones necesarias de events.py
 from events import load_events, add_event, modify_event
 # Importar funciones necesarias de content.py
@@ -943,7 +947,6 @@ def navigate_to_page(page: Page, page_name: str):
     # Pagina de eventos
     elif page_name == "events":
         
-        page.update()
         # Llama a la función load_events de events.py para obtener los eventos actuales como un dataframe
         events = load_events()
         # Llama a la función get_current_user de content.py para obtener el usuario acutal
@@ -952,18 +955,20 @@ def navigate_to_page(page: Page, page_name: str):
         # Función para crear carta de evento
         def create_event_card(event):
             """
-            Función para crear carta de evento.
+            Función para crear carta de evento intercativa.
 
             Args:
                 event (dic): recibe el diccionario de un evento
             Returns:
                 ft.GestureDetector: Retorna una carta que reacciona al hacer click sobre ella               
             """    
+
             # Establecer color del texto del estado del evento
             if event['estado']=="Abierto":
                 status_color=ft.colors.GREEN_900
             else:
                 status_color='red'
+
             # Crea un tipo GestureDetector            
             return ft.GestureDetector(
                 # Al clickear sobre el gesture detector llama la función show_event_details
@@ -1058,6 +1063,179 @@ def navigate_to_page(page: Page, page_name: str):
             # Actualiza la página
             page.update()
 
+        # Crear GeoDataFrame con los eventos
+        gdf = gpd.GeoDataFrame(
+            events,
+            geometry=gpd.points_from_xy(events.longitud, events.latitud),
+            crs="EPSG:4326"
+        )
+        
+        # Función para aplicar los filtros
+        def apply_filters(e):
+            '''
+            Aplica los filtros seleccionados a los eventos.
+
+            Args:
+                e: Evento de cambio
+            '''
+
+            # Se asigna el GeoDataFrame de los eventos a una variable que será filtrada
+            filtered_gdf = gdf    
+
+            # Si se selecciona una ciudad se filtra para que solo tenga los registros correspondientes a esa ciudad
+            if city_dropdown.value:
+                filtered_gdf = filtered_gdf[filtered_gdf['ciudad'] == city_dropdown.value]
+            
+            # Si hay un tipo de deporte se filtra para que solo contenga los registros del tipo de deporte especificado
+            if sport_dropdown.value:
+                filtered_gdf = filtered_gdf[filtered_gdf['tipo_deporte'] == sport_dropdown.value]
+            
+            # Si el interruptor está activado, se filtra para incluir solo los eventos que tengan estado abierto
+            if open_only_switch.value:
+                filtered_gdf = filtered_gdf[filtered_gdf['estado'] == 'Abierto']
+            
+            # Si el interruptor está activado, se filtra para incluir solo los eventos que tengan inscripción gratis
+            if free_only_switch.value:
+                filtered_gdf = filtered_gdf[filtered_gdf['costo_inscripcion'] == 'Gratis']
+            
+            # Si se selecciona una modalidad de participación , filtra para incluir solo las entradas con esa modalidad
+            if modality_dropdown.value:
+                filtered_gdf = filtered_gdf[filtered_gdf['modalidad_participacion'] == modality_dropdown.value]
+
+            # Si el usuario proporcionó ubicación válida (latitud y longitud obtenidas)
+            if user_latitude.value and user_longitude.value and distance_slider.value > 0:
+                # Crear punto con latitud y longitud del usuario
+                user_location = Point(float(user_longitude.value), float(user_latitude.value))
+                # Crea un GeoDataFrame con la ubicación del usuario y establece el sistema de coordenadas
+                user_gdf = gpd.GeoDataFrame(geometry=[user_location], crs="EPSG:4326")          
+
+                # Determinar una proyección UTM adecuada basada en la ubicación del usuario
+                utm_crs = CRS.from_proj4(f"+proj=utm +zone={int((float(user_longitude.value) + 180) / 6) + 1} +datum=WGS84 +units=m +no_defs")
+                
+                # Proyectar tanto la ubicación del usuario como los eventos a la proyección UTM
+                user_gdf_projected = user_gdf.to_crs(utm_crs)
+                filtered_gdf_projected = filtered_gdf.to_crs(utm_crs)
+
+                # Calcular distancias en metros
+                filtered_gdf_projected['distance'] = filtered_gdf_projected.geometry.distance(user_gdf_projected.iloc[0].geometry)
+
+                # Filtrar por distancia (convertir km a metros)
+                max_distance = distance_slider.value * 1000  # km to meters
+                filtered_gdf = filtered_gdf_projected[filtered_gdf_projected['distance'] <= max_distance].to_crs("EPSG:4326")                
+
+            update_event_grid(filtered_gdf)
+
+        # Función para limpiar filtros
+        def clear_filters(e):
+            '''
+            Limpia todos los filtros aplicados
+
+            Args:
+                e: Evento de click
+            '''
+
+            # Limpia los valores actuales y los actualiza
+            city_dropdown.value = None
+            sport_dropdown.value = None
+            open_only_switch.value = False
+            free_only_switch.value = False
+            modality_dropdown.value = None
+
+            city_dropdown.update()
+            sport_dropdown.update()
+            open_only_switch.update()
+            free_only_switch.update()
+            modality_dropdown.update()
+
+            # LLama la función apply_filters para aplicar filtros limmpios
+            apply_filters(None)
+
+        # Función para obtener la ubicación del usuario
+        def get_location(e):
+            '''
+            Obtiene la ubicación del usuario basada en el pais, departamento, ciudad y barrio ingresados.
+
+            Args:
+                e: Evento de click
+            '''
+            # Utiliza la librería Nominatim y busca pais, departamento, ciudad y barrio
+            geolocator = Nominatim(user_agent="myGeocoder")
+            address = f"{neighborhood_user.value}, {city_user.value}, {state_user.value}, {country_user.value}"
+            
+            # Obtiene latitud y longitud
+            location = geolocator.geocode(address)
+            # Si se obtiene una latitud y longitud
+            if location:
+                # Guarda latitud y longitud como valor de los campos user_latitude y user_longitude definidos
+                user_latitude.value = location.latitude
+                user_longitude.value = location.longitude
+                # valor que tiene Ubicación general que incluye ciudad y pais
+                user_location.value = f"Ubicación: {city_user.value}, {country_user.value}."
+                # Activa el slider de distancias
+                distance_slider.disabled = False
+            
+            # SI no se obtiene latitud y longitud
+            else:
+                # Guarda valores vacíos               
+                user_latitude.value = ""
+                user_longitude.value = ""                
+                user_location.value = "Ubicación: No definida"
+                # Desactiva el slider de distancias
+                distance_slider.disabled = True
+            
+            # Actualizar pagina
+            page.update()
+
+        # Controles de filtrado que llaman la funcion apply filters al seleccionar un valor de la lista desplegable
+        city_dropdown = ft.Dropdown(
+            label="Ciudad",
+            options=[ft.dropdown.Option(city) for city in gdf['ciudad'].unique()],
+            on_change=apply_filters
+        )
+
+        sport_dropdown = ft.Dropdown(
+            label="Deporte",
+            options=[ft.dropdown.Option(sport) for sport in gdf['tipo_deporte'].unique()],
+            on_change=apply_filters
+        )
+
+        open_only_switch = ft.Switch(label="Solo abiertos", on_change=apply_filters)
+        free_only_switch = ft.Switch(label="Solo gratis", on_change=apply_filters)
+
+        modality_dropdown = ft.Dropdown(
+            label="Modalidad",
+            options=[ft.dropdown.Option(modality) for modality in gdf['modalidad_participacion'].unique()],
+            on_change=apply_filters
+        )
+
+        clear_filters_button = ft.ElevatedButton(
+            text="Borrar filtros",
+            on_click=clear_filters
+        )
+
+        # Slider de distancia
+        distance_slider = ft.Slider(
+            min=0,
+            max=100,
+            divisions=10,
+            label="{value} km",
+            value=0,
+            disabled=True,
+            on_change=apply_filters
+        )
+
+        # Campos de ubicación que debe llenar el usuario
+        country_user = ft.TextField(label="País", width=200)
+        state_user = ft.TextField(label="Departamento/Estado", width=200)
+        city_user = ft.TextField(label="Ciudad", width=200)
+        neighborhood_user = ft.TextField(label="Barrio", width=200)
+        # Se inicializa la longitud y la latiud del usuario como vacío
+        user_latitude = ft.TextField(label="", read_only=True)
+        user_longitude = ft.TextField(label="", read_only=True)
+        user_location = ft.TextField(label="Tu ubicación", read_only=True)
+        # Botón que llama la función get location para guardar la ubicación
+        user_location_button = ft.ElevatedButton("Guardar mi ubicación", on_click=get_location)
+
         # Crea un ft.GridView (Cuadricula)
         event_grid = ft.GridView(
             # Se expande para ocupar todo el espacio disponible
@@ -1074,11 +1252,21 @@ def navigate_to_page(page: Page, page_name: str):
             run_spacing=10,
         )
 
-        # Itera entre cada evento de todos los eventos del Dataframe
-        for _, event in events.iterrows():
-            # Para cada evento llama la función create_event card y crea una carta
-            event_grid.controls.append(create_event_card(event))
+        def update_event_grid(filtered_gdf):
+            '''
+            Actualiza la cuadrícula de eventos con los eventos filtrados.
 
+            Args:
+                filtered_gdf (GeoDataFrame): GeoDataFrame de eventos filtrados
+            '''
+            # limpiar todos los eventos de la cuadrícula
+            event_grid.controls.clear()
+            # Para cada evento con los filtros seleccionados crea una carta de evento
+            for _, event in filtered_gdf.iterrows():
+                event_grid.controls.append(create_event_card(event))
+            #Actualizar la pagina
+            page.update()
+       
         # Llama la función get_current_user de content.py para obtener el usuario actual
         current_user=get_current_user()
         # Si hay un usuario activo podrá crear un evento
@@ -1094,10 +1282,17 @@ def navigate_to_page(page: Page, page_name: str):
                 on_click=lambda e: navigate_to_page(page, "create_event") 
         )
             # Contenido si hay un usuario activo
-            content = [
-                ft.Text("Eventos", size=30, weight=ft.FontWeight.BOLD),
+            content = [                             
+                ft.Text("Filtros", size=20, weight=ft.FontWeight.BOLD),   
+                # Filtros             
+                ft.Row([city_dropdown, sport_dropdown, modality_dropdown]),
+                ft.Row([open_only_switch, free_only_switch, clear_filters_button]),
+                ft.Text("Busca eventos cercanos a ti: Ingresa tus datos.", size=20, weight=ft.FontWeight.BOLD),                
+                ft.Row([country_user, state_user, city_user, neighborhood_user, user_location_button]),
+                ft.Row([user_location]),
+                ft.Row([ft.Text("Distancia máxima:"), distance_slider, ft.Text("Ingresa tu ubicación para habilitar")]),
                 # Boton crear evento
-                create_event_button,
+                ft.Row([ft.Text("Eventos", size=30, weight=ft.FontWeight.BOLD),create_event_button]),
                 # Cuadricula de eventos
                 event_grid,
             ]
@@ -1105,10 +1300,17 @@ def navigate_to_page(page: Page, page_name: str):
         # Si no hay un usuario activo
         else:
             # El contenido será unicamente la cuadrícula
-            content = [
-                ft.Text("Eventos", size=30, weight=ft.FontWeight.BOLD),                
-                event_grid,
+            content = [                
+                ft.Text("Filtros", size=20, weight=ft.FontWeight.BOLD),
+                # Filtros
+                ft.Row([city_dropdown, sport_dropdown, modality_dropdown]),
+                ft.Row([open_only_switch, free_only_switch, clear_filters_button]),
+                ft.Text("Eventos", size=30, weight=ft.FontWeight.BOLD),                              
+                event_grid
             ]
+
+        # Inicializa la página de eventos sin filtros
+        apply_filters(None)
 
     # Pagina de crear eventos
     elif page_name == "create_event":

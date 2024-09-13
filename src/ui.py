@@ -9,6 +9,7 @@ from PIL import Image as PILImage
 from flet import Page, Image
 from geopy.geocoders import Nominatim
 from pyproj import CRS
+import numpy as np
 # Importar funciones necesarias de events.py
 from events import load_events, add_event, modify_event
 # Importar funciones necesarias de content.py
@@ -955,58 +956,61 @@ def navigate_to_page(page: Page, page_name: str):
         # Función para crear carta de evento
         def create_event_card(event):
             """
-            Función para crear carta de evento intercativa.
+            Crea una tarjeta de evento interactiva.
 
             Args:
-                event (dic): recibe el diccionario de un evento
+                event (dict): Diccionario con la información del evento.
+
             Returns:
-                ft.GestureDetector: Retorna una carta que reacciona al hacer click sobre ella               
+                ft.GestureDetector: Retorna una tarjeta que reacciona al hacer clic sobre ella.
             """    
-
             # Establecer color del texto del estado del evento
-            if event['estado']=="Abierto":
-                status_color=ft.colors.GREEN_900
+            if event['estado'] == "Abierto":
+                status_color = ft.colors.GREEN_900
             else:
-                status_color='red'
+                status_color = 'red'
+            
+            # Crear el contenido de la tarjeta
+            card_content = [
+                ft.Image(src=event['logo'], width=200, height=200, fit=ft.ImageFit.COVER),
+                ft.Container(
+                    content=ft.Text(event['nombre'], size=14, weight=ft.FontWeight.BOLD),
+                    margin=ft.margin.only(top=5, bottom=5),
+                ),
+                ft.Text(f"{event['fecha']} - {event['hora']}", size=12),
+                ft.Text(f"Estado: {event['estado']}", size=13, color=status_color, weight=ft.FontWeight.BOLD),
+            ]
 
-            # Crea un tipo GestureDetector            
+            # Agregar la distancia si está disponible
+            if 'distance' in event:
+                distance_km = event['distance'] / 1000  # Convertir metros a kilómetros
+                card_content.append(ft.Text(f"Distancia: {distance_km:.2f} km", size=12))
+
+            # Agregar la descripción
+            card_content.append(
+                ft.Container(
+                    content=ft.Text(
+                        event['descripcion'],
+                        size=12,
+                        max_lines=2,
+                        overflow=ft.TextOverflow.ELLIPSIS
+                    ),
+                    margin=ft.margin.only(top=5),
+                    expand=True,
+                )
+            )
+
+            # Crear y retornar el GestureDetector con la tarjeta
             return ft.GestureDetector(
-                # Al clickear sobre el gesture detector llama la función show_event_details
                 on_tap=lambda _: show_event_details(event),
-                # Contenido del gestureDetector, el primero es un ft.Card
                 content=ft.Card(
-                    # Contenido del ft.Card , el primero es un ft.Container con color de fondo
                     content=ft.Container(
                         bgcolor=ft.colors.BLUE_200,
                         border=ft.border.all(2, ft.colors.BLACK),
                         padding=5,
-                        # Contenido del ft.Container, el primero es un ft.Column (contenedor vertical)
-                        content=ft.Column([
-                            # Contiene logo del evento, y nombre
-                            ft.Image(src=event['logo'], width=200, height=200, fit=ft.ImageFit.COVER),
-                            ft.Container(
-                                content=ft.Text(event['nombre'], size=14, weight=ft.FontWeight.BOLD),
-                                margin=ft.margin.only(top=5, bottom=5),
-                                                                
-                            ),
-                            # Contiene fecha y hora del evento
-                            ft.Text(f"{event['fecha']} - {event['hora']}", size=12),
-                            # Contiene el estado del evento
-                            ft.Text(f"Estado: {event['estado']}", size=13, color=status_color, weight=ft.FontWeight.BOLD),
-                            # Contiene descripción del evento
-                            ft.Container(
-                                content=ft.Text(
-                                    event['descripcion'],
-                                    size=12,
-                                    max_lines=2,
-                                    overflow=ft.TextOverflow.ELLIPSIS
-                                ),
-                                margin=ft.margin.only(top=5),
-                                expand=True,
-                            ),
-                        ],spacing=2),
+                        content=ft.Column(card_content, spacing=2),
                         width=200,
-                        height=250
+                        height=280  # Aumentado para acomodar la línea de distancia
                     ),
                 )
             )
@@ -1079,28 +1083,34 @@ def navigate_to_page(page: Page, page_name: str):
                 e: Evento de cambio
             '''
 
-            # Se asigna el GeoDataFrame de los eventos a una variable que será filtrada
-            filtered_gdf = gdf    
+            # Crea una copia del Dataframe original
+            filtered_gdf = gdf.copy()    
+            # Crear una lista para almacenar todas las condiciones de filtro
+            filter_conditions = []
 
-            # Si se selecciona una ciudad se filtra para que solo tenga los registros correspondientes a esa ciudad
+            # Si se selecciona una ciudad se filtra para que solo tenga los registros correspondientes a esa ciudad y se añada a la lista
             if city_dropdown.value:
-                filtered_gdf = filtered_gdf[filtered_gdf['ciudad'] == city_dropdown.value]
+                filter_conditions.append(filtered_gdf['ciudad'] == city_dropdown.value)
             
-            # Si hay un tipo de deporte se filtra para que solo contenga los registros del tipo de deporte especificado
+            # Si hay un tipo de deporte se filtra para que solo contenga los registros del tipo de deporte especificado y se añada a la lista
             if sport_dropdown.value:
-                filtered_gdf = filtered_gdf[filtered_gdf['tipo_deporte'] == sport_dropdown.value]
+                filter_conditions.append(filtered_gdf['tipo_deporte'] == sport_dropdown.value)
             
-            # Si el interruptor está activado, se filtra para incluir solo los eventos que tengan estado abierto
+            # Si el interruptor está activado, se filtra para incluir solo los eventos que tengan estado abierto y se añada a la lista
             if open_only_switch.value:
-                filtered_gdf = filtered_gdf[filtered_gdf['estado'] == 'Abierto']
+                filter_conditions.append(filtered_gdf['estado'] == 'Abierto')
             
-            # Si el interruptor está activado, se filtra para incluir solo los eventos que tengan inscripción gratis
+            # Si el interruptor está activado, se filtra para incluir solo los eventos que tengan inscripción gratis y se añada a la lista
             if free_only_switch.value:
-                filtered_gdf = filtered_gdf[filtered_gdf['costo_inscripcion'] == 'Gratis']
+                filter_conditions.append(filtered_gdf['costo_inscripcion'] == 'Gratis')
             
-            # Si se selecciona una modalidad de participación , filtra para incluir solo las entradas con esa modalidad
+            # Si se selecciona una modalidad de participación , filtra para incluir solo las entradas con esa modalidad y se añada a la lista
             if modality_dropdown.value:
-                filtered_gdf = filtered_gdf[filtered_gdf['modalidad_participacion'] == modality_dropdown.value]
+                filter_conditions.append(filtered_gdf['modalidad_participacion'] == modality_dropdown.value)
+
+            # Aplicar de una vez todos los filtros
+            if filter_conditions:
+                filtered_gdf = filtered_gdf.loc[np.logical_and.reduce(filter_conditions)]
 
             # Si el usuario proporcionó ubicación válida (latitud y longitud obtenidas)
             if user_latitude.value and user_longitude.value and distance_slider.value > 0:
@@ -1120,9 +1130,14 @@ def navigate_to_page(page: Page, page_name: str):
                 filtered_gdf_projected['distance'] = filtered_gdf_projected.geometry.distance(user_gdf_projected.iloc[0].geometry)
 
                 # Filtrar por distancia (convertir km a metros)
-                max_distance = distance_slider.value * 1000  # km to meters
-                filtered_gdf = filtered_gdf_projected[filtered_gdf_projected['distance'] <= max_distance].to_crs("EPSG:4326")                
+                if distance_slider.value:
+                    max_distance = distance_slider.value * 1000  # km to meters
+                    filtered_gdf = filtered_gdf_projected[filtered_gdf_projected['distance'] <= max_distance].to_crs("EPSG:4326")                
+            else:
+                # Si no hay ubicación del usuario, asignar distancia infinita
+                filtered_gdf['distance'] = float('inf')
 
+            # Llama la función update_event_grid para actualizar la cuadrícula con los eventos filtrados    
             update_event_grid(filtered_gdf)
 
         # Función para limpiar filtros
@@ -1140,12 +1155,14 @@ def navigate_to_page(page: Page, page_name: str):
             open_only_switch.value = False
             free_only_switch.value = False
             modality_dropdown.value = None
+            distance_slider.value = 0
 
             city_dropdown.update()
             sport_dropdown.update()
             open_only_switch.update()
             free_only_switch.update()
             modality_dropdown.update()
+            distance_slider.update()
 
             # LLama la función apply_filters para aplicar filtros limmpios
             apply_filters(None)
@@ -1184,6 +1201,7 @@ def navigate_to_page(page: Page, page_name: str):
                 distance_slider.disabled = True
             
             # Actualizar pagina
+            apply_filters(None)
             page.update()
 
         # Controles de filtrado que llaman la funcion apply filters al seleccionar un valor de la lista desplegable
@@ -1234,7 +1252,7 @@ def navigate_to_page(page: Page, page_name: str):
         user_longitude = ft.TextField(label="", read_only=True)
         user_location = ft.TextField(label="Tu ubicación", read_only=True)
         # Botón que llama la función get location para guardar la ubicación
-        user_location_button = ft.ElevatedButton("Guardar mi ubicación", on_click=get_location)
+        user_location_button = ft.ElevatedButton("Usar esta ubicación", on_click=get_location)
 
         # Crea un ft.GridView (Cuadricula)
         event_grid = ft.GridView(
@@ -1263,7 +1281,10 @@ def navigate_to_page(page: Page, page_name: str):
             event_grid.controls.clear()
             # Para cada evento con los filtros seleccionados crea una carta de evento
             for _, event in filtered_gdf.iterrows():
-                event_grid.controls.append(create_event_card(event))
+                event_dict = event.to_dict()
+                if 'distance' in event_dict:
+                    event_dict['distance'] = event_dict['distance']
+                event_grid.controls.append(create_event_card(event_dict))
             #Actualizar la pagina
             page.update()
        

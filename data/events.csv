@@ -1,3 +1,2 @@
-id,nombre,tipo_deporte,fecha,hora,lugar,ciudad,latitud,longitud,descripcion,modalidad_participacion,capacidad,organizador,costo_inscripcion,estado,logo
-1,Torneo Futbol-11 UNAL MED,Fútbol,2024-11-09,16:00,Universidad Nacional Sede Medellin,Medellin,6.263864,-75.575158,Torneo de futbol 11 entre las facultades de la unal med,Equipos,8,sportex,Gratis,Abierto,uploads\events\logos\event_1.png
-2,Sustentación Final SPORTEX,Otro,2024-09-16,13:00,Facultad de Minas,Medellin,6.273992,-75.592668,Sustentación final de la app de sportex,Individual,20,sportex,Gratis,Abierto,uploads\events\logos\event_2.png
+id,nombre,tipo_deporte,fecha,hora,lugar,ciudad,latitud,longitud,descripcion,modalidad_participacion,capacidad,organizador,costo_inscripcion,estado,logo,inscritos,usuarios_inscritos
+1,asd,Baloncesto,asd,asd,sad,Bello,6.26449,-75.575621,asd,Individual,2,sportex,Gratis,Abierto,uploads/events/logos/evento_default.png,1,"[""seusse""]"

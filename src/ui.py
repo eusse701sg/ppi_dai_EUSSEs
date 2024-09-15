@@ -10,8 +10,9 @@ from flet import Page, Image
 from geopy.geocoders import Nominatim
 from pyproj import CRS
 import numpy as np
+import json
 # Importar funciones necesarias de events.py
-from events import load_events, add_event, modify_event
+from events import load_events, add_event, modify_event, inscribe_user, uninscribe_user, get_user_events
 # Importar funciones necesarias de content.py
 from content import read_privacy_policy, register_user, authenticate_user, change_password, get_current_user, set_current_user, save_profile_picture, save_event_logo
 
@@ -570,6 +571,52 @@ def navigate_to_page(page: Page, page_name: str):
             navigate_to_page(page, "login")
             return
         
+        # Función para mostrar los eventos en los que el usuario está inscrito
+        def show_inscribed_events():
+            """
+            Muestra los eventos en los que el usuario actual está inscrito.
+
+            Llama a la función `get_user_events` para obtener los eventos en los que el usuario está registrado, 
+            luego muestra una lista de dichos eventos con la opción de desinscribirse de cada uno.
+
+            Args:
+                None
+
+            Returns:
+                events_list (ft.Column): Un componente de Flutter que contiene los eventos en los que 
+                el usuario está inscrito, con un botón para desinscribirse de cada evento.
+            """
+            # Llama la función get_user_events de events.py con el username como parametro
+            user_events = get_user_events(current_user['username'])
+
+            # Inicializa la lista de eventos con un ft.Column vacío
+            events_list = ft.Column([
+                ft.Text("Mis eventos inscritos", size= 20, weight=ft.FontWeight.BOLD),
+            ],alignment=ft.MainAxisAlignment.START)
+
+            # Función para remover un evento de la interfaz del perfil y desinscribir de un evento
+            def unsubscribe_from_event(event):
+                # Llama la función uninscribe_user de events.py para desincribir al usuario
+                if uninscribe_user(event['id'], current_user['username']):
+                    # Remueve el evento desinscrito de la pagina de perfil
+                    events_list.controls.remove(event_row)
+                    page.update()
+            
+            # Itera sobre todos los eventos en los que está inscrito el usuario
+            for event in user_events:
+                # Crear un ft.Row por cada evento
+                event_row = ft.Row([
+                    ft.Text(event['nombre']),
+                    ft.Text(f"{event['fecha']} - {event['hora']}"),
+                    # Boton para desinscribir que llama la función unsuscribe_from_event
+                    ft.ElevatedButton("Desinscribir", on_click=lambda _: unsubscribe_from_event(event))
+                ])
+                # Concatena todos los eventos en los que está inscrito el usuario
+                events_list.controls.append(event_row)
+
+            # Retorna la lista de eventos que el usuario está inscrito
+            return events_list            
+
         # Funcion para cambiar contraseña    
         def handle_password_change(e):
             """
@@ -760,8 +807,9 @@ def navigate_to_page(page: Page, page_name: str):
             # Actualiza la página
             page.update()
 
+
         # Columna contenedora de los eventos creados por el usuario
-        user_events_column = ft.Column([], scroll=ft.ScrollMode.AUTO, height=300)
+        user_events_column = ft.Column([], scroll=ft.ScrollMode.AUTO, height=300, alignment=ft.MainAxisAlignment.START)
         # Se llama la función update_user_events para modificar user_events_column
         update_user_events()
 
@@ -814,9 +862,10 @@ def navigate_to_page(page: Page, page_name: str):
                     # Linea para dividir con los otros atributos
                     ft.Divider(),
                     # Texto con mis eventos creados
+                    show_inscribed_events(),
                     ft.Text("Mis eventos creados", size=20, weight=ft.FontWeight.BOLD),
                     # Eventos creados definido anteriormente
-                    user_events_column 
+                    user_events_column,                     
                 ], 
                 # Alineamiento de contenedor vertical tipo Colum
                 alignment=ft.MainAxisAlignment.START, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
@@ -979,6 +1028,7 @@ def navigate_to_page(page: Page, page_name: str):
                 ),
                 ft.Text(f"{event['fecha']} - {event['hora']}", size=12),
                 ft.Text(f"Estado: {event['estado']}", size=13, color=status_color, weight=ft.FontWeight.BOLD),
+                ft.Text(f"Inscritos: {event['inscritos']}", size=13, color=status_color)
             ]
 
             # Agregar la distancia si está disponible
@@ -1030,6 +1080,93 @@ def navigate_to_page(page: Page, page_name: str):
                 dialog.open = False
                 page.update()
 
+            # Función para el manejo de la inscripción desde la página de eventos
+            def toggle_inscription(_):
+                """
+                
+                Args:
+                    None, es llamado al dar click en un botón que la invoca
+
+                Returns:
+                    No retorna ningun valor, solo actualiza la interfaz
+                    
+                """
+                # Obtiene usuario logeado
+                current_user = get_current_user()
+                # Si hay un usuario logeado
+                if current_user:
+                    # Obtiene el nombre de usuario
+                    username = current_user['username']
+                    # Si el usuario está dentro de los usuarios inscritos de un evento
+                    if username in event['usuarios_inscritos']:
+                        # Llama la funcion uniscribe_user de events.py para desinscribir un usuario
+                        if uninscribe_user(event['id'], username):
+                            # Cambia el texto del botón de Desinscribirme a Inscribirme
+                            inscription_button.text = "Inscribirme"
+                            # Disminuye eventos en 1
+                            event['inscritos'] -= 1     
+                    # Si el usuario no está dentro de los usuarios inscritos de un evento                               
+                    else:
+                        # Llama la función inscribe_user de events.py para inscribir un usuario
+                        if inscribe_user(event['id'], username):
+                            # Cambia el texto del botón de desinscribirme a Inscribirme
+                            inscription_button.text = "Desinscribirme"
+                            # Aumenta los inscritos en 1
+                            event['inscritos'] += 1
+
+                    # Si los inscritos son mayor igual a la capacidad de un evento
+                    if event['inscritos'] >= event['capacidad']:
+                        # El estado del evento se pone en curso
+                        event['estado'] = "En curso"
+                        # Desactiva el botón de inscribirse
+                        inscription_button.disabled = True
+                    # Si el estado del evento está en curso y los inscritos son menores a la capacidad    
+                    elif event['estado'] == "En curso" and event['inscritos'] < event['capacidad']:
+                        # Pasa a estado abierto
+                        event['estado'] = "Abierto"
+                        # Activa el botón para inscribirse
+                        inscription_button.disabled = False
+
+                    # Texto que compara los inscritos respecto a la capacidad total
+                    inscribed_text.value = f"Inscritos: {event['inscritos']}/{event['capacidad']}"
+
+                    # Cierra la ventana emergente
+                    close_dialog(_)
+                    # Actualiza la página eventos para visualizar los cambios
+                    navigate_to_page(page, "events")
+                     
+            # Obtiene el usuario actual
+            current_user = get_current_user()
+
+            # Si hay un usuario activo
+            if current_user:
+                # Si el usuario está dentro de los usuarios inscritos de un evento
+                if current_user['username'] in event['usuarios_inscritos']:
+                    # Crea el botón desinscribirme que al dar click llama la función toggle_inscription y se activa
+                    inscription_button_text = "Desinscribirme"
+                    inscription_button = ft.ElevatedButton(
+                        text = inscription_button_text,
+                        on_click=toggle_inscription,
+                        disabled=False
+                    )
+                # Si el usuario NO está dentro de los usuarios inscritos de un evento    
+                else:
+                    # Crea el botón Inscribirme que al dar click llama la función toggle_inscription 
+                    inscription_button_text = "Inscribirme"
+                    inscription_button = ft.ElevatedButton(
+                        text= inscription_button_text,
+                        on_click = toggle_inscription,
+                        # Se desactiva el botón en caso de que el estado sea diferente a abierto o los inscritos superen la capacidad
+                        disabled=(event['estado'] != "Abierto" or event['inscritos'] >= event['capacidad'])
+                    )
+            # SI no hay un usuario activo        
+            else:
+                # Texto que indica que debe iniciar sesión para inscribirse
+                inscription_button = ft.Text("Inicia sesión para inscribirte", color='blue', weight=ft.FontWeight.BOLD)
+
+            # Texto para mostrar el numero de inscritos
+            inscribed_text = ft.Text(f"Inscritos: {event['inscritos']}/{event['capacidad']}")
+
             # Crear el dialogo que se genera al abrir un evento tipo ft.AlerDialog
             dialog = ft.AlertDialog(
                 # Contiene, titulo, logo y más detalles del evento
@@ -1043,7 +1180,8 @@ def navigate_to_page(page: Page, page_name: str):
                             ft.Text(f"Hora: {event['hora']}"),
                             ft.Text(f"Lugar: {event['lugar']}"),
                             ft.Text(f"Ciudad: {event['ciudad']}"),
-                            ft.Text(f"Estado: {event['estado']}"),                             
+                            ft.Text(f"Estado: {event['estado']}"),
+                            inscribed_text,                             
                         ]),
                     ]),                  
                     ft.Text("Detalles:",size=30, weight=ft.FontWeight.BOLD),
@@ -1053,7 +1191,8 @@ def navigate_to_page(page: Page, page_name: str):
                     ft.Text(f"Capacidad: {event['capacidad']}"),                    
                     ft.Text(f"Costo de inscripción: {event['costo_inscripcion']}"),
                     # Boton para redirigir a la ubicación de google maps                    
-                    ft.TextButton(f"Ver ubicación en Google Maps", on_click=lambda _: page.launch_url(f"https://www.google.com/maps?q={event['latitud']},{event['longitud']}"))
+                    ft.TextButton(f"Ver ubicación en Google Maps", on_click=lambda _: page.launch_url(f"https://www.google.com/maps?q={event['latitud']},{event['longitud']}")),
+                    inscription_button,
                     
                 ], scroll=ft.ScrollMode.AUTO, height=400), #Habilita el scroll
                 actions=[
@@ -2026,6 +2165,25 @@ def navigate_to_page(page: Page, page_name: str):
         # Boton para cancelar
         cancel_button = ft.ElevatedButton("Cancelar", on_click=lambda _: navigate_to_page(page, "profile"))
 
+        inscribed_users = json.loads(event['usuarios_inscritos'])
+
+        participants_column = ft.Column(
+            spacing=10,
+            scroll=ft.ScrollMode.AUTO
+        )
+
+        for i, usuario in enumerate(inscribed_users, start=1):
+            user_row = ft.Container(
+                content=ft.Row([
+                    ft.Text(f"{i}. ", weight=ft.FontWeight.BOLD),
+                    ft.Text(usuario)
+                ]),
+                bgcolor=ft.colors.BLUE_50 if i % 2 == 0 else ft.colors.WHITE,
+                padding=10,
+                border_radius=5
+            )
+            participants_column.controls.append(user_row)
+
         content = [
             ft.Text("Modificar Evento", size=30, weight=ft.FontWeight.BOLD),
             name_field,
@@ -2044,7 +2202,9 @@ def navigate_to_page(page: Page, page_name: str):
             longitude_field,           
             ft.Row([current_logo, logo_button]),
             save_button,
-            cancel_button
+            cancel_button,
+            ft.Text("Usuarios Inscritos", size= 30, weight=ft.FontWeight.BOLD),
+            participants_column
         ]
 
     # Añade a la pagina el encabezado y el contenido según la página en la que está ubicado

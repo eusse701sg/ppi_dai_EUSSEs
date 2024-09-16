@@ -11,6 +11,12 @@ from geopy.geocoders import Nominatim
 from pyproj import CRS
 import numpy as np
 import json
+from scipy import stats
+import matplotlib.pyplot as plt
+import matplotlib
+from flet.matplotlib_chart import MatplotlibChart
+import base64
+from io import BytesIO
 # Importar funciones necesarias de events.py
 from events import load_events, add_event, modify_event, inscribe_user, uninscribe_user, get_user_events
 # Importar funciones necesarias de content.py
@@ -226,19 +232,19 @@ def navigate_to_page(page: Page, page_name: str):
         # Contenido de la página
         content = [
             ft.Container(
-                content=ft.Text("Contáctame", size=30, text_align="center"),
+                content=ft.Text("Contáctame", size=30, text_align="center", weight=ft.FontWeight.BOLD),
                 padding=10
             ),
             ft.Container(
-                content=ft.Text("Si tienes alguna pregunta o necesitas asistencia, no dudes en ponerte en contacto conmigo.", size=25),
+                content=ft.Text("Si tienes alguna pregunta o necesitas asistencia, no dudes en ponerte en contacto conmigo.", size=25, weight=ft.FontWeight.BOLD),
                 padding=10
             ),            
             ft.Container(
-                content=ft.Text("Correo Electrónico: santiagoegla@gmail.com", size=25),
+                content=ft.Text("Correo Electrónico: santiagoegla@gmail.com", size=25, weight=ft.FontWeight.BOLD),
                 padding=10
             ),
             ft.Container(
-                content=ft.Text("WhatsApp: +57 319-799-4175", size=25),
+                content=ft.Text("WhatsApp: +57 319-799-4175", size=25, weight=ft.FontWeight.BOLD),
                 padding=10
             ),
             ft.Container(
@@ -265,7 +271,7 @@ def navigate_to_page(page: Page, page_name: str):
         content = [
             # Titulo principal
             ft.Container(
-                content=ft.Text("Quién soy", size=30, text_align="center"),
+                content=ft.Text("Quién soy", size=30, text_align="center", weight=ft.FontWeight.BOLD),
                 padding=10
             ),
             # Txt de quién soy
@@ -274,7 +280,8 @@ def navigate_to_page(page: Page, page_name: str):
                     who_am_i_text,
                     size=16,
                     # Texto justificado
-                    text_align="justify"
+                    text_align="justify",
+                    weight=ft.FontWeight.BOLD
                 ),
                 # Contenedor alineado al centro a la izquierda
                 alignment=ft.alignment.center_left, 
@@ -541,7 +548,8 @@ def navigate_to_page(page: Page, page_name: str):
             ft.Container(
                 # Titulo iniciar sesión
                 content=ft.Text("Iniciar sesión", size=30, text_align="center"),
-                padding=10
+                padding=10,
+                alignment= ft.alignment.center
             ),
             ft.Container(
                 # Contenedor con los campos de usuario y contraseña
@@ -550,12 +558,14 @@ def navigate_to_page(page: Page, page_name: str):
                         email_or_username_field,
                         password_field,
                         # Boton iniciar sesión que llama a la función handle_login
-                        ft.ElevatedButton("Iniciar sesión", on_click=handle_login)
+                        ft.ElevatedButton("Iniciar sesión", on_click=handle_login, width=200, bgcolor="blue", color="white")
                     ],
                     alignment="center",
-                    spacing=10
+                    spacing=20,
+                    horizontal_alignment= ft.CrossAxisAlignment.CENTER
                 ),
-                padding=10
+                padding=10,
+                alignment= ft.alignment.center
             )
         ]
 
@@ -906,14 +916,15 @@ def navigate_to_page(page: Page, page_name: str):
             color = ft.colors.BLACK
         )
 
-        # Titulo de la página para usuarios REGISTRADOS 
-        title2 = ft.Text(
-            "Bienvenido de nuevo!",
-            text_align="center",
-            size = 40,
-            weight = ft.FontWeight.W_900,
-            color = ft.colors.BLACK
-        )
+        if user:
+            # Titulo de la página para usuarios REGISTRADOS 
+            title2 = ft.Text(
+                f"Bienvenido(a) de nuevo! {user['names']}",
+                text_align="center",
+                size = 40,
+                weight = ft.FontWeight.W_900,
+                color = ft.colors.BLACK
+            )
         
         # Texto de pequeña información bajo los titulos para usuarios NO REGISTRADOS
         descriptions = ft.Text( 
@@ -925,7 +936,7 @@ def navigate_to_page(page: Page, page_name: str):
         
         # Texto de pequeña información bajo lso titulos para usuario registrados
         descriptions2 = ft.Text( 
-            "Proximamente Inicio mejorado para usuarios registrados",
+            "  Comienza ya a participar en los eventos\n  y gana grandiosas recompensas!🏅📅",
             text_align="center",
             size=25
             
@@ -1440,7 +1451,19 @@ def navigate_to_page(page: Page, page_name: str):
                 color="white",
                 # Navega a pagina create_event por medio de la función navigate_to_page
                 on_click=lambda e: navigate_to_page(page, "create_event") 
-        )
+            )
+            
+            # Boton para visualizar estadísticas de los eventos
+            view_statistics_button = ft.ElevatedButton(
+                text="Ver Estadísticas",
+                width=150,
+                height=50,
+                bgcolor="blue",
+                color="white",
+                # Navega a pagina statistics por medio de la función navigate_to_page
+                on_click=lambda e: navigate_to_page(page, "statistics") 
+            )
+
             # Contenido si hay un usuario activo
             content = [                             
                 ft.Text("Filtros", size=20, weight=ft.FontWeight.BOLD),   
@@ -1452,7 +1475,7 @@ def navigate_to_page(page: Page, page_name: str):
                 ft.Row([user_location]),
                 ft.Row([ft.Text("Distancia máxima:"), distance_slider, ft.Text("Ingresa tu ubicación para habilitar")]),
                 # Boton crear evento
-                ft.Row([ft.Text("Eventos", size=30, weight=ft.FontWeight.BOLD),create_event_button]),
+                ft.Row([ft.Text("Eventos", size=30, weight=ft.FontWeight.BOLD),create_event_button, view_statistics_button]),
                 # Cuadricula de eventos
                 event_grid,
             ]
@@ -2165,13 +2188,16 @@ def navigate_to_page(page: Page, page_name: str):
         # Boton para cancelar
         cancel_button = ft.ElevatedButton("Cancelar", on_click=lambda _: navigate_to_page(page, "profile"))
 
+        # Lee los usuarios inscritos
         inscribed_users = json.loads(event['usuarios_inscritos'])
 
+        # Inicializa una columna vacía
         participants_column = ft.Column(
             spacing=10,
             scroll=ft.ScrollMode.AUTO
         )
 
+        # Por cada usuario los agrega a la columna
         for i, usuario in enumerate(inscribed_users, start=1):
             user_row = ft.Container(
                 content=ft.Row([
@@ -2207,6 +2233,118 @@ def navigate_to_page(page: Page, page_name: str):
             participants_column
         ]
 
+    # Pagina para visualizar estadísticas de todos los eventos en general
+    elif page_name == "statistics": 
+
+        # Usar SVG como formato de salida de Matplotlib
+        matplotlib.use('svg')      
+        # Actualización de parámetros para reducir el tamaño de fuente global en los gráficos 
+        plt.rcParams.update({'font.size': 6}) 
+
+        def calculate_statistics():
+            '''
+            Calcula estadísticas descriptivas y genera visualizaciones sobre los eventos.
+
+            Return:
+                ft.Column: Componente de Flet que muestra las esadísticas y gráficos
+            '''
+
+            # LLama la función load_events de events.py para obtener los eventos como un dataframe
+            df = load_events()
+            
+            ## Estadísticas con NumPy
+            # Media de la capacida
+            capacity_mean = np.mean(df['capacidad'])
+            # Desviación estándar de la capacidad
+            capacity_std = np.std(df['capacidad']) 
+            # Mediana de la capacidad
+            capacity_median = np.median(df['capacidad']) 
+
+            ## Estadísticas con SciPy
+            # Moda de la capacidad
+            mode_result = stats.mode(df['capacidad'])
+            # Extrae el valor de la moda
+            capacity_mode = mode_result.mode
+            # Asimetría de la distribución
+            capacity_skewness = stats.skew(df['capacidad'])
+            # Curtosis de la distribución
+            capacity_kurtosis = stats.kurtosis(df['capacidad'])
+
+            ## Crear gráficos con Matplotlib
+            # Subplots de 1 fila y 2 columnas
+            fig1, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4))
+            # Ajusta layout para evitar superposiciones
+            plt.tight_layout(pad=3.0)
+
+            # Gráfico 1: Distribución de Eventos por Tipo de Deporte (gráfico de barras)
+            # Conteo por tipo de deporte
+            df['tipo_deporte'].value_counts().plot(kind='bar', ax=ax1)
+            # Titulo del gráfico
+            ax1.set_title('Eventos por Tipo de Deporte', fontsize=8)
+            # Etiqueta del eje X
+            ax1.set_xlabel('Tipo de Deporte', fontsize=6)
+            # Etiqueta del eje Y
+            ax1.set_ylabel('Número de Eventos', fontsize=6)
+            # Tamaño de etiquetas
+            ax1.tick_params(axis='both', which='major', labelsize=5)
+
+            # Gráfico 2: Distribución de Eventos por Ciudad (grafico de pastel)
+            # Pie chart de eventos por ciudad
+            df['ciudad'].value_counts().plot(kind='pie', autopct='%1.1f%%', ax=ax2)
+            # Título del gráfico
+            ax2.set_title('Eventos por Ciudad', fontsize=8)
+            # Tamaño de etiquetas
+            ax2.tick_params(axis='both', which='major', labelsize=5)
+
+            # Crear otro conjunto de gráficos
+            # Set de subplots de 1 fila 2 columnas
+            fig2, (ax3, ax4) = plt.subplots(1, 2, figsize=(8, 4))
+            # Ajuste de layout para evitar superposiciones
+            plt.tight_layout(pad=3.0)
+
+            # Gráfico 3: Distribución de Capacidad de Eventos (Histograma)
+            # Histograma de la capacidad de los eventos
+            df['capacidad'].hist(bins=20, ax=ax3)
+            # Titulo
+            ax3.set_title('Distribución de Capacidad', fontsize=8)
+            # Etiqueta eje X
+            ax3.set_xlabel('Capacidad', fontsize=6)
+            # Etiqueta eje Y
+            ax3.set_ylabel('Frecuencia', fontsize=6)
+            # Tamaño de etiquetas
+            ax3.tick_params(axis='both', which='major', labelsize=5)
+
+            # Gráfico 4: Comparación de Capacidad: Individual vs Equipo (boxplot)
+            # Filtrar eventos individuales
+            individual_events = df[df['modalidad_participacion'] == 'Individual']['capacidad']
+            # Filtrar eventos de equipo
+            team_events = df[df['modalidad_participacion'] == 'Equipos']['capacidad']
+            # Gráfico boxplot
+            ax4.boxplot([individual_events, team_events], labels=['Individual', 'Equipos'])
+            # Titulo
+            ax4.set_title('Capacidad: Individual vs Equipos', fontsize=8)
+            # Etiqueta eje Y
+            ax4.set_ylabel('Capacidad', fontsize=6)
+            # Tamaño de etiquetas
+            ax4.tick_params(axis='both', which='major', labelsize=5)
+
+            # Columna que contiene todos los gráficos y texto
+            return ft.Column([
+                ft.Text("Estadísticas de Eventos", size=24, weight=ft.FontWeight.BOLD),
+                ft.Text(f"Capacidad Promedio: {capacity_mean:.2f}", size=16),
+                ft.Text(f"Desviación Estándar de Capacidad: {capacity_std:.2f}", size=16),
+                ft.Text(f"Mediana de Capacidad: {capacity_median}", size=16),
+                ft.Text(f"Moda de Capacidad: {capacity_mode}", size=16),
+                ft.Text(f"Asimetría de Capacidad: {capacity_skewness:.2f}", size=16),
+                ft.Text(f"Curtosis de Capacidad: {capacity_kurtosis:.2f}", size=16),
+                MatplotlibChart(fig1),
+                ft.Divider(),
+                MatplotlibChart(fig2)
+            ])
+
+        # Añadir columna al contenido de la página
+        content=[calculate_statistics()]
+    
     # Añade a la pagina el encabezado y el contenido según la página en la que está ubicado
     page.controls.extend([create_header_row(page)] + content) 
     # Actualizar pagina

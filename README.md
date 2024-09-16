@@ -48,30 +48,7 @@ Actualmente, existe una demanda continua de plataformas que faciliten la partici
 - **Framework UI**: Flet
 - **Estructura**:
 
-sportex
-├── assets                                            
-│   ├── LogoSportex.png (varios)
-│   └── uploads
-│       ├── events
-│       │   ├── ayuda_latitud_longitud.jpg
-│       │   └── logos
-│       │       └── event_id.png (varios)
-│       └── profile
-│           └── user_profile.png (varios)
-├── data
-│   ├── events.csv
-│   └── user_db.txt
-├── docs
-│   ├── privacy_policy.txt
-│   └── who_am_i.txt
-├── src                                          
-│   ├── content.py
-│   ├── events.py
-│   ├── main.py
-│   └── ui.py
-├── .gitignore
-├── README.md
-└── requirements.txt  
+![Estructura](https://github.com/eusse701sg/ppi_dai_EUSSEs/blob/main/assets/estructura.jpg)  
 
 - **`assets/`**: Contiene los recursos estáticos utilizados en la aplicación, como imágenes y archivos de carga.
   - `uploads/`: Carpeta para archivos cargados por el usuario.

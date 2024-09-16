@@ -1298,6 +1298,7 @@ def navigate_to_page(page: Page, page_name: str):
             Args:
                 e: Evento de click
             '''
+            user=get_current_user()
 
             # Limpia los valores actuales y los actualiza
             city_dropdown.value = None
@@ -1305,14 +1306,19 @@ def navigate_to_page(page: Page, page_name: str):
             open_only_switch.value = False
             free_only_switch.value = False
             modality_dropdown.value = None
-            distance_slider.value = 0
+            
+            if user:
+                # SOlo se actualiza si hay un usuario activo
+                distance_slider.value = 0
 
             city_dropdown.update()
             sport_dropdown.update()
             open_only_switch.update()
             free_only_switch.update()
             modality_dropdown.update()
-            distance_slider.update()
+            if user:
+                # Solo se actualiza si hay un usuario activo
+                distance_slider.update()
 
             # LLama la función apply_filters para aplicar filtros limmpios
             apply_filters(None)

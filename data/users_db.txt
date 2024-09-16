@@ -4,3 +4,4 @@ prueba@gmail.com,1234,prueba,prueba,prueba
 mai@gmail.com,1234,mai,Maria Fernanda,Herrera
 juan@gmail.com,1234,juan,juan,rodriguez
 adriana@gmail.com,1234,adriana,adriana,gil
+pruebafinal,12345,pruebafinal,prueba,final
